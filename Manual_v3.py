@@ -14,20 +14,88 @@ from sklearn.preprocessing import MinMaxScaler
 #%%
 df = pd.read_csv('f9ad.csv')
 
-#"target": 2.246109785281624
-GRUunits=409.3721529040721
-attr_count=2.6325142468158926
-dense_units_1 = 6.21110584971706
-memory_meters = 25
-step_extension = 6.252594943440926
-    
-GRUunits=int(GRUunits)
-dense_units_1=int(dense_units_1)
+# def optimize_me(hGRU,
+#                 hAttrCount,
+#                 hDense1,
+#                 hMemoryMeters,
+#                 hstep_extension,
+#                 hConv1,
+#                 hConv1k,
+#                 hPoolSize,
+#                 hDense2):
 
-memory_meters=int(memory_meters)
 
-step_extension=int(step_extension)
-attr_count = int(attr_count)
+hAttrCount= 3
+hConv1=2
+hConv1k=16
+hDense1=80
+hDense2=1
+hGRU=28
+hMemoryMeters=50
+hPoolSize= 1
+hstep_extension= 5
+# 3.193115349607608
+
+
+
+
+# hAttrCount= 3
+# hConv1=2
+# hConv1k=16
+# hDense1=80
+# hDense2=1
+# hGRU=28
+# hMemoryMeters=50
+# hPoolSize= 1
+# hstep_extension= 3
+# 3.2071875458916113
+
+
+# hAttrCount= 3
+# hConv1=2
+# hConv1k=8
+# hDense1=80
+# hDense2=1
+# hGRU=28
+# hMemoryMeters=50
+# hPoolSize= 1
+# hstep_extension= 5
+# 3.1638209675360724
+
+# hAttrCount= 3
+# hConv1=2
+# hConv1k=16
+# hDense1=80
+# hDense2=1
+# hGRU=28
+# hMemoryMeters=50
+# hPoolSize= 1
+# hstep_extension= 5
+
+
+hyperlist = [hGRU,
+            hAttrCount,
+            hDense1,
+            hMemoryMeters,
+            hstep_extension,
+            hConv1,
+            hConv1k,
+            hPoolSize,
+            hDense2]
+
+for i in range(len(hyperlist)):
+    hyperlist[i] = int(hyperlist[i])
+
+[hGRU,
+hAttrCount,
+hDense1,
+hMemoryMeters,
+hstep_extension,
+hConv1,
+hConv1k,
+hPoolSize,
+hDense2]   = hyperlist 
+
 
 imagination_meters = 25
 
@@ -331,7 +399,7 @@ from sklearn.neighbors import RadiusNeighborsRegressor
 
 reg = RadiusNeighborsRegressor()
 
-step_length = index_mean * step_extension
+step_length = index_mean * hstep_extension
 
 i_train_min = np.min(X_train[index])
 i_train_max = np.max(X_train[index])
@@ -443,7 +511,7 @@ if asel_choice == '1':
     
     corr_m = corr_m[corr_m[:,0].argsort()]
     
-    keep_columns = corr_m[-1-attr_count:-1,1]
+    keep_columns = corr_m[-1-hAttrCount:-1,1]
     # cutoff = np.nanpercentile(np.abs(corr_values),50) #correlation cutoff
     
     # keep_columns = []
@@ -478,7 +546,7 @@ elif asel_choice == '2':
     #     if explained_variance[i] >= min_required_variance:
     #         break
         
-    PCA_n = attr_count
+    PCA_n = hAttrCount
     
     # applied after sensitivity analysis
 
@@ -535,7 +603,7 @@ if PCA_n != -1:
 
 ## from now on, arrays are being morphed into shapes valid for RNN+MLP
 
-memory = int(memory_meters/step_length)
+memory = int(hMemoryMeters/step_length)
 
 imagination = int(imagination_meters/step_length)
 
@@ -703,7 +771,7 @@ visible2 = Input(shape=((memory+imagination),len(X_train[0])))
 x1 = GaussianNoise(0.02)(visible1)
 
 
-x1 = GRU(units=GRUunits, kernel_initializer =  'glorot_uniform',
+x1 = GRU(units=hGRU, kernel_initializer =  'glorot_uniform',
            recurrent_initializer='orthogonal',
            bias_initializer="zeros", kernel_regularizer='l2', recurrent_regularizer=None,
            bias_regularizer=None, activity_regularizer=None, kernel_constraint=None,
@@ -717,10 +785,10 @@ x1 = Dropout(0.05)(x1)
  
 
 
-conv11 = Conv1D(8, kernel_size=8, activation='relu')(visible2)
-pool11 = MaxPool1D(pool_size=2)(conv11)
+conv11 = Conv1D(hConv1, kernel_size=hConv1k, activation='relu')(visible2)
+pool11 = MaxPool1D(pool_size=hPoolSize)(conv11)
 drop2 = Dropout(0.05)(pool11)
-dense2 = Dense(4)(drop2)
+dense2 = Dense(hDense2)(drop2)
 # conv12 = Conv1D(16, kernel_size=4, activation='relu')(pool11)
 # pool12 = MaxPool1D(pool_size=2)(conv12)
 flat1 = Flatten()(drop2)
@@ -765,10 +833,14 @@ history = model.fit(X_train_m,y_train_RNN,validation_data=(X_test_m,y_test_RNN),
 model = load_model(f'best_model.h5')
 
 result = model.evaluate(X_test_m, y_test_RNN)
-print(result)
 
+if np.isnan(result):
+    result = 0
+    
+print(-np.log10(result))
 
-## Plots
+#%%
+# Plots
 pred = model.predict(X_train_m)
 
 for i in range(10):
@@ -809,29 +881,26 @@ for i in range(5):
     plt.legend()
     plt.show()
 #%%
-## Tuning
+# Tuning
 
 # from bayes_opt import BayesianOptimization
 # from bayes_opt.logger import JSONLogger
 # from bayes_opt.event import Events
 
-
 # # Bounded region of parameter space
 
 
+# pbounds =      {'hGRU' : (2, 512),
+#                 'hAttrCount' : (1, 10),
+#                 'hDense1' : (1, 256),
+#                 'hMemoryMeters' : (1, 50),
+#                 'hstep_extension' : (5, 20),
+#                 'hConv1' : (1,32),
+#                 'hConv1k' : (1,16),
+#                 'hPoolSize' : (1,16),
+#                 'hDense2' : (1,16)}
 
 
-
-
-
-
-
-
-# pbounds = {'memory_meters': (1, 50), 
-#             'step_extension': (5, 20), 
-#             'attr_count': (1, 10),
-#             'GRUunits': (2, 512),
-#             'dense_units_1': (2, 256)}
 
 # optimizer = BayesianOptimization(
 #     f=optimize_me,
@@ -843,7 +912,7 @@ for i in range(5):
 # optimizer.subscribe(Events.OPTIMIZATION_STEP, logger)
 
 # optimizer.maximize(
-#     init_points=6,
+#     init_points=10,
 #     n_iter=1000,
 # )
 #%%

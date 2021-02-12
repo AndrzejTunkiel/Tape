@@ -848,7 +848,7 @@ pbounds =      {'hGRU' : (2, 512),
                 'hMemoryMeters' : (1, 50),
                 'hstep_extension' : (5, 20),
                 'hConv1' : (1,32),
-                'hConv1k' : (1,32),
+                'hConv1k' : (1,16),
                 'hPoolSize' : (1,16),
                 'hDense2' : (1,16)}
 

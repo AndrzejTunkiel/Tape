@@ -743,7 +743,7 @@ def run_me():
 
     
     
-    x1 = GRU(units=16, kernel_initializer =  'glorot_uniform',
+    x1 = GRU(units=64, kernel_initializer =  'glorot_uniform',
                recurrent_initializer='orthogonal',
                bias_initializer="zeros", kernel_regularizer='l2', recurrent_regularizer=None,
                bias_regularizer=None, activity_regularizer=None, kernel_constraint=None,

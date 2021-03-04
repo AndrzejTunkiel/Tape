@@ -46,7 +46,8 @@ def tape(data,
                    convert_to_diff = [],
                    lcs_list = [],
                    clean=False,
-                   shift = 0.1):
+                   shift = 0.1,
+                   resample='radius'):
 
 
     df = data
@@ -350,9 +351,9 @@ def tape(data,
     
     ## Resampling
     if clean == False:
-        from sklearn.neighbors import RadiusNeighborsRegressor
         
-        reg = RadiusNeighborsRegressor()
+
+        
         
         step_length = index_mean * hstep_extension
         
@@ -364,8 +365,14 @@ def tape(data,
         index_train = np.arange(i_train_min, i_train_max, step_length).reshape(-1,1)
         index_test = np.arange(i_test_min, i_test_max, step_length).reshape(-1,1)
         
-        
-        reg = RadiusNeighborsRegressor(radius=index_maxgap, weights='distance')
+        if resample == 'radius':
+            from sklearn.neighbors import RadiusNeighborsRegressor
+            reg = RadiusNeighborsRegressor(radius=index_maxgap, weights='distance')
+        elif resample == 'knn':
+            from sklearn.neighbors import KNeighborsRegressor
+            reg = KNeighborsRegressor(weights='distance')
+        else:
+            sys.exit("Error, incorrect resampling algorithms choice")
         
         reg.fit(X_train[index].to_numpy().reshape(-1,1), y_train[target].to_numpy())
         y_train = pd.DataFrame()

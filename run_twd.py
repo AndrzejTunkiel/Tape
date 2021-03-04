@@ -33,7 +33,37 @@ for split in splits:
                                       target =  'MWD Continuous Inclination dega',
                                       convert_to_diff = [],
                                       lcs_list = ['MWD Continuous Inclination dega'],
-                                      plot_samples = False)
+                                      plot_samples = False,
+                                      resample='radius')
+    
+    truth_array.append(truth)
+    pred_array.append(pred)
+    columns_array.append(columns)
+    score_array.append(score)
+    
+diffs = []
+
+for i in range(len(truth_array)):
+    diffs.append(np.average(np.abs(truth_array[i] - pred_array[i]), axis=0))
+
+sns.heatmap(diffs, vmax=1.2, vmin=0, cmap='viridis')
+plt.title(np.average(diffs))
+plt.show()
+
+
+truth_array = []
+pred_array = []
+columns_array = []
+score_array = []
+for split in splits:
+    truth, pred, columns, score = tape(data, split=split,
+                                      drops=drops,
+                                      index = 'Measured Depth m',
+                                      target =  'MWD Continuous Inclination dega',
+                                      convert_to_diff = [],
+                                      lcs_list = ['MWD Continuous Inclination dega'],
+                                      plot_samples = False,
+                                      resample='knn')
     
     truth_array.append(truth)
     pred_array.append(pred)

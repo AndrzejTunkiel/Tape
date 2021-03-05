@@ -29,10 +29,12 @@ for split in splits:
                                       drops=drops,
                                       index = 'Measured Depth m',
                                       target =  'MWD Continuous Inclination dega',
-                                      convert_to_diff = [],
-                                      lcs_list = ['MWD Continuous Inclination dega'],
+                                      convert_to_diff = ['MWD Continuous Inclination dega'],
+                                      lcs_list = [],
                                       plot_samples = False,
-                                      resample='radius')
+                                      resample='radius',
+                                      asel_choice = 'ppscore',
+                                      hAttrCount=6)
     
     truth_array.append(truth)
     pred_array.append(pred)

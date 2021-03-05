@@ -62,22 +62,23 @@ for i in extensions:
     global_p95.append(np.percentile(local_results,95))
 
 axs[0].scatter(extensions, global_results, marker = '.', label='RNR',
-               c='black', s=10)
+               c='black', s=10,)
 
 axs[0].scatter(extensions, global_p5, marker = '_', label='RNR',
-               c='gray', s=10)
+               c='gray', s=10,)
 
 axs[0].scatter(extensions, global_p95, marker = '_', label='RNR',
                c='gray', s=10)
 axs[0].set_xlabel('Radius multiplier')
 axs[0].set_ylabel('MAE')
 axs[0].grid()
+axs[0].set_axisbelow(True)
 #plt.legend()
 #plt.ylim(0.175,0.3)
 #plt.show()
 #%%
 print()
-carlo=500
+carlo=1000
 global_p95 = []
 global_p5 = []
 extensions = np.arange(1,101,1)
@@ -127,6 +128,7 @@ axs[1].set_xlabel('Neighbour count')
 #plt.ylabel('MAE')
 #plt.legend()
 axs[1].grid()
+axs[1].set_axisbelow(True)
 #plt.ylim(0.15,0.3)
 #plt.show()
 #%%
@@ -182,6 +184,7 @@ plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 #plt.ylabel('MAE')
 #plt.legend()
 axs[2].grid()
+axs[2].set_axisbelow(True)
 #plt.ylim(0.15,0.3)
 plt.tight_layout()
 plt.savefig('resampling.pdf')

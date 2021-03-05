@@ -1021,7 +1021,7 @@ def tape(data,
         result_test = 0
     #print(-np.log10(result_test))
     
-    if PCA_n != 1:
+    if PCA_n != -1:
         keep_columns = pca_allattr
     
     print(f'MAE: {np.average(np.abs(truth-pred))}')

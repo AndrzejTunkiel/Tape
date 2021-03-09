@@ -47,7 +47,9 @@ def tape(data,
                    lcs_list = [],
                    clean=False,
                    shift = 0.1,
-                   resample='radius'):
+                   resample='radius',
+                   resample_coef = 1,
+                   resample_weights='distance'):
 
 
     df = data
@@ -367,10 +369,10 @@ def tape(data,
         
         if resample == 'radius':
             from sklearn.neighbors import RadiusNeighborsRegressor
-            reg = RadiusNeighborsRegressor(radius=index_maxgap, weights='distance')
+            reg = RadiusNeighborsRegressor(radius=index_maxgap*resample_coef, weights=resample_weights)
         elif resample == 'knn':
             from sklearn.neighbors import KNeighborsRegressor
-            reg = KNeighborsRegressor(weights='distance')
+            reg = KNeighborsRegressor(weights=resample_weights, n_neighbors=resample_coef)
         else:
             sys.exit("Error, incorrect resampling algorithms choice")
         

@@ -126,3 +126,4 @@ dmypy.json
 *.h5
 *.h5
 best_model.h5
+*.h5

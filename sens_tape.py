@@ -10,6 +10,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import sys
+import random
 from sklearn.preprocessing import MinMaxScaler
 from numpy.random import seed
 import tensorflow as tf
@@ -289,7 +290,7 @@ def tape(data,
         
         for attribute in list(dfs):
             if fill_method[attribute] == 'ffill':
-                dfs[attribute] = dfs[attribute].ffill().rolling(5, center=True).mean().ffill().bfill()
+                dfs[attribute] = dfs[attribute].ffill()#.rolling(5, center=True).mean().ffill().bfill()
         
     #%%
     
@@ -367,38 +368,58 @@ def tape(data,
         index_train = np.arange(i_train_min, i_train_max, step_length).reshape(-1,1)
         index_test = np.arange(i_test_min, i_test_max, step_length).reshape(-1,1)
         
-        if resample == 'radius':
-            from sklearn.neighbors import RadiusNeighborsRegressor
-            reg = RadiusNeighborsRegressor(radius=index_maxgap*resample_coef, weights=resample_weights)
-        elif resample == 'knn':
-            from sklearn.neighbors import KNeighborsRegressor
-            reg = KNeighborsRegressor(weights=resample_weights, n_neighbors=resample_coef)
+        if resample != 'no':
+            if resample == 'radius':
+                from sklearn.neighbors import RadiusNeighborsRegressor
+                reg = RadiusNeighborsRegressor(radius=index_maxgap*resample_coef, weights=resample_weights)
+            elif resample == 'knn':
+                from sklearn.neighbors import KNeighborsRegressor
+                reg = KNeighborsRegressor(weights=resample_weights, n_neighbors=resample_coef)
+            else:
+                sys.exit("Error, incorrect resampling algorithms choice")
+            
+            reg.fit(X_train[index].to_numpy().reshape(-1,1), y_train[target].to_numpy())
+            y_train = pd.DataFrame()
+            y_train[target] = reg.predict(index_train)
+            
+            reg.fit(X_test[index].to_numpy().reshape(-1,1), y_test[target].to_numpy())
+            y_test = pd.DataFrame()
+            y_test[target] = reg.predict(index_test)
+            
+            X_train_resampled = pd.DataFrame()
+            for attribute in list(X_train):
+                reg.fit(X_train[index].to_numpy().reshape(-1,1), X_train[attribute].to_numpy())
+                X_train_resampled[attribute] = reg.predict(index_train)
+                
+            X_train = X_train_resampled 
+        
+            X_test_resampled = pd.DataFrame()
+            for attribute in list(X_train):
+                reg.fit(X_test[index].to_numpy().reshape(-1,1), X_test[attribute].to_numpy())
+                X_test_resampled[attribute] = reg.predict(index_test)
+                
+            X_test = X_test_resampled
+            
+        elif resample == 'no':
+            train_q = int((i_train_max - i_train_min)/step_length)
+            test_q  = int((i_test_max - i_test_min)/step_length)
+            
+            
+            #sample_train = np.sort(random.sample(range(len(X_train)), train_q))
+            #sample_test = np.sort(random.sample(range(len(X_test)), test_q))
+            
+            sample_train = np.linspace(0, len(X_train)-1, train_q, dtype=int)
+            sample_test = np.linspace(0, len(X_test)-1, test_q, dtype=int)          
+            
+            X_train = X_train.iloc[sample_train,:]
+            y_train = y_train.iloc[sample_train,:]
+            
+            X_test = X_test.iloc[sample_test,:]
+            y_test = y_test.iloc[sample_test,:]
+        
         else:
-            sys.exit("Error, incorrect resampling algorithms choice")
-        
-        reg.fit(X_train[index].to_numpy().reshape(-1,1), y_train[target].to_numpy())
-        y_train = pd.DataFrame()
-        y_train[target] = reg.predict(index_train)
-        
-        reg.fit(X_test[index].to_numpy().reshape(-1,1), y_test[target].to_numpy())
-        y_test = pd.DataFrame()
-        y_test[target] = reg.predict(index_test)
-        
-        X_train_resampled = pd.DataFrame()
-        for attribute in list(X_train):
-            reg.fit(X_train[index].to_numpy().reshape(-1,1), X_train[attribute].to_numpy())
-            X_train_resampled[attribute] = reg.predict(index_train)
+            sys.exit("Error, incorrect resampling choice")
             
-        X_train = X_train_resampled
-        
-        
-        
-        X_test_resampled = pd.DataFrame()
-        for attribute in list(X_train):
-            reg.fit(X_test[index].to_numpy().reshape(-1,1), X_test[attribute].to_numpy())
-            X_test_resampled[attribute] = reg.predict(index_test)
-            
-        X_test = X_test_resampled
     #%%
     
     ## Inclination to delta inclination convertion needed here!

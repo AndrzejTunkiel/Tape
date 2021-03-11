@@ -52,10 +52,10 @@ for i in range(len(truth_array)):
 sns.heatmap(diffs, vmax=1.2, vmin=0, cmap='viridis')
 plt.title(np.average(diffs))
 
-plt.show()
+
 plt.savefig('knn1d.pdf')
 np.save('knn1d.npy', diffs)
-
+plt.clf()
 ###
 
 
@@ -88,10 +88,10 @@ for i in range(len(truth_array)):
 
 sns.heatmap(diffs, vmax=1.2, vmin=0, cmap='viridis')
 plt.title(np.average(diffs))
-plt.show()
+# plt.show()
 plt.savefig('knn1u.pdf')
 np.save('knn1u.npy', diffs)
-
+plt.clf()
 ###
 
 
@@ -124,10 +124,10 @@ for i in range(len(truth_array)):
 
 sns.heatmap(diffs, vmax=1.2, vmin=0, cmap='viridis')
 plt.title(np.average(diffs))
-plt.show()
+# plt.show()
 plt.savefig('knn8d.pdf')
 np.save('knn8d.npy', diffs)
-
+plt.clf()
 
 ###
 
@@ -161,10 +161,10 @@ for i in range(len(truth_array)):
 
 sns.heatmap(diffs, vmax=1.2, vmin=0, cmap='viridis')
 plt.title(np.average(diffs))
-plt.show()
+# plt.show()
 plt.savefig('knn8u.pdf')
 np.save('knn8u.npy', diffs)
-
+plt.clf()
 
 truth_array = []
 pred_array = []
@@ -196,10 +196,10 @@ for i in range(len(truth_array)):
 sns.heatmap(diffs, vmax=1.2, vmin=0, cmap='viridis')
 plt.title(np.average(diffs))
 
-plt.show()
+# plt.show()
 plt.savefig('r1d.pdf')
 np.save('r1d.npy', diffs)
-
+plt.clf()
 ###
 
 
@@ -232,10 +232,10 @@ for i in range(len(truth_array)):
 
 sns.heatmap(diffs, vmax=1.2, vmin=0, cmap='viridis')
 plt.title(np.average(diffs))
-plt.show()
+# plt.show()
 plt.savefig('r1u.pdf')
 np.save('r1u.npy', diffs)
-
+plt.clf()
 ###
 
 
@@ -268,10 +268,10 @@ for i in range(len(truth_array)):
 
 sns.heatmap(diffs, vmax=1.2, vmin=0, cmap='viridis')
 plt.title(np.average(diffs))
-plt.show()
+# plt.show()
 plt.savefig('r8d.pdf')
 np.save('r8d.npy', diffs)
-
+plt.clf()
 ###
 
 
@@ -304,6 +304,7 @@ for i in range(len(truth_array)):
 
 sns.heatmap(diffs, vmax=1.2, vmin=0, cmap='viridis')
 plt.title(np.average(diffs))
-plt.show()
+# plt.show()
 plt.savefig('r8u.pdf')
 np.save('r8u.npy', diffs)
+plt.clf()

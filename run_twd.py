@@ -42,7 +42,7 @@ for split in splits:
     score_array.append(score)
     
 diffs = []
-
+#%%
 for i in range(len(truth_array)):
     diffs.append(np.average(np.abs(truth_array[i] - pred_array[i]), axis=0))
 

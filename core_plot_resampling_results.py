@@ -8,33 +8,86 @@ Created on Fri Mar 12 09:54:29 2021
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
-df = pd.read_csv('deleteme.csv')
+df = pd.read_csv('resampling_study.csv')
 
 resampling = ['radius', 'knn']
 weight = ['uniform', 'distance']
 
-
+fig, axs = plt.subplots(1, 4, sharey=True, figsize=(8,3))
+i=0
 for r in resampling:
     for w in weight:
         dft = df.loc[(df['resampling'] == r) & (df['weight'] == w)]
         
         x = dft['K'].astype(int)
-        y = dft['MAE'].rolling(window=5).mean()
+        y = dft['MAE']
         
-        plt.plot(x,y, label=f'{r} n {w}')
+        axs[i].scatter(x,y, label=f'{r} n {w}', c='black', s=10, marker='x')
+        
+        dft = df.loc[(df['resampling'] == 'no')]
+        y_no = np.mean(dft['MAE'])
+        axs[i].hlines(y_no, 0, 100, label='no resampling average', color='black',
+                   linewidth=1, linestyle="--")
+        # y_no = np.min(dft['MAE'])
+        # axs[i].hlines(y_no, 0, 100, label='no resampling min/max', color='black',
+        #            linewidth=0.7, linestyle='--')
+        # y_no = np.max(dft['MAE'])
+        # axs[i].hlines(y_no, 0, 100, color='black',
+        #            linewidth=0.7, linestyle='--')
+        #axs[i].set_ylim(0.75,1.4)
+        #axs[i].legend()
+        axs[i].grid()
+        axs[i].set_xlabel(f'{r} n {w}')
+        
+        i += 1
+        
+axs[0].set_ylabel('Mean Absolute Error')
 
-plt.legend()
+
+axs[0].set_xlabel(f'radius\nuniform weight')
+axs[1].set_xlabel(f'radius\ndistance weight')
+axs[2].set_xlabel(f'neighbors\nuniform weight')
+axs[3].set_xlabel(f'neighbors\distance weight')
+plt.tight_layout()
 plt.show()
 
+fig, axs = plt.subplots(1, 4, sharey=True, figsize=(8,3))
+i=0
 for r in resampling:
     for w in weight:
         dft = df.loc[(df['resampling'] == r) & (df['weight'] == w)]
         
         x = dft['K'].astype(int)
-        y = dft['usable'].rolling(window=5).mean()
+        y = dft['usable']
         
-        plt.plot(x,y, label=f'{r} n {w}')
+        
+        axs[i].scatter(x,y, label=f'{r} n {w}', c='black', s=10, marker='x')
+        
+        dft = df.loc[(df['resampling'] == 'no')]
+        y_no = np.mean(dft['usable'])
+        axs[i].hlines(y_no, 0, 100, label='no resampling average', color='black',
+                   linewidth=1, linestyle="--")
+        # y_no = np.min(dft['usable'])
+        # axs[i].hlines(y_no, 0, 100, label='no resampling min/max', color='black',
+        #            linewidth=0.7, linestyle='--')
+        # y_no = np.max(dft['usable'])
+        # axs[i].hlines(y_no, 0, 100, color='black',
+        #            linewidth=0.7, linestyle='--')
+        #axs[i].set_ylim(0.75,1.4)
+        #axs[i].legend()
+        axs[i].grid()
+        axs[i].set_xlabel(f'{r} n {w}')
+        
+        i += 1
+        
+axs[0].set_ylabel('Prediction area under 1.2 deg. error')
 
-plt.legend()
+
+axs[0].set_xlabel(f'radius\nuniform weight')
+axs[1].set_xlabel(f'radius\ndistance weight')
+axs[2].set_xlabel(f'neighbors\nuniform weight')
+axs[3].set_xlabel(f'neighbors\distance weight')
+plt.tight_layout()
 plt.show()

@@ -15,7 +15,7 @@ df = pd.read_csv('resampling_study.csv')
 resampling = ['radius', 'knn']
 weight = ['uniform', 'distance']
 
-fig, axs = plt.subplots(1, 4, sharey=True, figsize=(8,3))
+fig, axs = plt.subplots(1, 4, sharey=True, figsize=(9,3))
 i=0
 for r in resampling:
     for w in weight:
@@ -24,11 +24,11 @@ for r in resampling:
         x = dft['K'].astype(int)
         y = dft['MAE']
         
-        axs[i].scatter(x,y, label=f'{r} n {w}', c='black', s=10, marker='x')
+        axs[i].scatter(x,y, c='black', s=10, marker='x')
         
         dft = df.loc[(df['resampling'] == 'no')]
         y_no = np.mean(dft['MAE'])
-        axs[i].hlines(y_no, 0, 100, label='no resampling average', color='black',
+        axs[i].hlines(y_no, 0, 100, label='no resampling', color='black',
                    linewidth=1, linestyle="--")
         # y_no = np.min(dft['MAE'])
         # axs[i].hlines(y_no, 0, 100, label='no resampling min/max', color='black',
@@ -50,10 +50,12 @@ axs[0].set_xlabel(f'radius\nuniform weight')
 axs[1].set_xlabel(f'radius\ndistance weight')
 axs[2].set_xlabel(f'neighbors\nuniform weight')
 axs[3].set_xlabel(f'neighbors\distance weight')
+axs[3].legend()
 plt.tight_layout()
+plt.savefig('resampling mae.pdf')
 plt.show()
 
-fig, axs = plt.subplots(1, 4, sharey=True, figsize=(8,3))
+fig, axs = plt.subplots(1, 4, sharey=True, figsize=(9,3))
 i=0
 for r in resampling:
     for w in weight:
@@ -63,11 +65,11 @@ for r in resampling:
         y = dft['usable']
         
         
-        axs[i].scatter(x,y, label=f'{r} n {w}', c='black', s=10, marker='x')
+        axs[i].scatter(x,y, c='black', s=10, marker='x')
         
         dft = df.loc[(df['resampling'] == 'no')]
         y_no = np.mean(dft['usable'])
-        axs[i].hlines(y_no, 0, 100, label='no resampling average', color='black',
+        axs[i].hlines(y_no, 0, 100, label='no resampling', color='black',
                    linewidth=1, linestyle="--")
         # y_no = np.min(dft['usable'])
         # axs[i].hlines(y_no, 0, 100, label='no resampling min/max', color='black',
@@ -89,5 +91,7 @@ axs[0].set_xlabel(f'radius\nuniform weight')
 axs[1].set_xlabel(f'radius\ndistance weight')
 axs[2].set_xlabel(f'neighbors\nuniform weight')
 axs[3].set_xlabel(f'neighbors\distance weight')
+axs[3].legend()
 plt.tight_layout()
+plt.savefig('resampling useful.pdf')
 plt.show()

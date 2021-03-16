@@ -43,13 +43,24 @@ for r in resampling:
         
         i += 1
         
-axs[0].set_ylabel('Mean Absolute Error')
+axs[0].set_ylabel('Mean Absolute Error\n[degrees]')
 
 
-axs[0].set_xlabel(f'radius\nuniform weight')
-axs[1].set_xlabel(f'radius\ndistance weight')
-axs[2].set_xlabel(f'neighbors\nuniform weight')
-axs[3].set_xlabel(f'neighbors\ndistance weight')
+axs[0].set_title(f'Fixed Radius\nuniform weight')
+axs[1].set_title(f'Fixed Radius\ndistance weight')
+axs[2].set_title(f'K-Nearest Neighbors\nuniform weight')
+axs[3].set_title(f'K-Nearest Neighbors\ndistance weight')
+
+
+axs[0].set_xlabel(f'radius multiplier n\n (r = n * max_step)')
+axs[1].set_xlabel(f'radius multiplier n\n (r = n * max_step)')
+axs[2].set_xlabel(f'K, neighbor count')
+axs[3].set_xlabel(f'K, neighbor count')
+
+
+for i in range(4):
+    axs[i].set_xticks(np.linspace(0,100,6).astype(int))
+
 axs[3].legend()
 plt.tight_layout()
 plt.savefig('resampling mae.pdf')
@@ -84,13 +95,22 @@ for r in resampling:
         
         i += 1
         
-axs[0].set_ylabel('Prediction area under 1.2 deg. error')
+axs[0].set_ylabel('Prediction area under\n 1.2 deg. error')
+
+axs[0].set_title(f'Fixed Radius\nuniform weight')
+axs[1].set_title(f'Fixed Radius\ndistance weight')
+axs[2].set_title(f'K-Nearest Neighbors\nuniform weight')
+axs[3].set_title(f'K-Nearest Neighbors\ndistance weight')
 
 
-axs[0].set_xlabel(f'radius\nuniform weight')
-axs[1].set_xlabel(f'radius\ndistance weight')
-axs[2].set_xlabel(f'neighbors\nuniform weight')
-axs[3].set_xlabel(f'neighbors\ndistance weight')
+axs[0].set_xlabel(f'radius multiplier n\n (r = n * max_step)')
+axs[1].set_xlabel(f'radius multiplier n\n (r = n * max_step)')
+axs[2].set_xlabel(f'K, neighbor count')
+axs[3].set_xlabel(f'K, neighbor count')
+
+for i in range(4):
+    axs[i].set_xticks(np.linspace(0,100,6).astype(int))
+
 axs[3].legend()
 plt.tight_layout()
 plt.savefig('resampling useful.pdf')

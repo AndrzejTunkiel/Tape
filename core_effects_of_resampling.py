@@ -22,7 +22,7 @@ drops = ['Unnamed: 0', 'Unnamed: 0.1', 'RHX_RT unitless', 'Pass Name unitless',
 dfs = data.iloc[2000:10000]
 index = 'Measured Depth m'
 target =  'MWD Continuous Inclination dega',
-#%%
+
 fig, axs = plt.subplots(1, 2, sharey=True, figsize=(8,3))
 index_dr = np.diff(dfs[index])
 
@@ -52,21 +52,21 @@ raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[0].plot(x,y, c='blue', linewidth=1, label='radius = 1 min_g', linestyle="-")
+axs[0].plot(x,y, c='blue', linewidth=1, label='r = 1 max step', linestyle="-")
 
-reg = RadiusNeighborsRegressor(radius=index_maxgap*10, weights='uniform')
+reg = RadiusNeighborsRegressor(radius=index_maxgap*20, weights='uniform')
 raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[0].plot(x,y, c='black', linewidth=1, label='radius = 10 min_g', linestyle="-")
+axs[0].plot(x,y, c='black', linewidth=1, label='r = 20 max step', linestyle="-")
 
 reg = RadiusNeighborsRegressor(radius=index_maxgap*100, weights='uniform')
 raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[0].plot(x,y, c='black', linewidth=1, label='radius = 100 min_g', linestyle="--")
+axs[0].plot(x,y, c='black', linewidth=1, label='r = 100 max step', linestyle="--")
 
 
 raw_x = dfs[index].to_numpy()
@@ -86,21 +86,21 @@ raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[1].plot(x,y, c='blue', linewidth=1, label='radius = 1 min_g', linestyle="-")
+axs[1].plot(x,y, c='blue', linewidth=1, label='r = 1 max step', linestyle="-")
 
-reg = RadiusNeighborsRegressor(radius=index_maxgap*10, weights='distance')
+reg = RadiusNeighborsRegressor(radius=index_maxgap*20, weights='distance')
 raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[1].plot(x,y, c='black', linewidth=1, label='radius = 10 min_g', linestyle="-")
+axs[1].plot(x,y, c='black', linewidth=1, label='r = 20 max step', linestyle="-")
 
 reg = RadiusNeighborsRegressor(radius=index_maxgap*100, weights='distance')
 raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[1].plot(x,y, c='black', linewidth=1, label='radius = 100 min_g', linestyle="--")
+axs[1].plot(x,y, c='black', linewidth=1, label='r = 100 max step', linestyle="--")
 
 
 raw_x = dfs[index].to_numpy()
@@ -117,3 +117,44 @@ axs[1].set_xlabel('Measured Depth [m]')
 
 plt.savefig('resampling_radius.pdf')
 plt.show()
+
+#%%
+
+plt.figure(figsize=(5,4))
+
+x = np.arange(1,101,1)
+y = 1/x
+
+import matplotlib
+
+cmap = matplotlib.cm.get_cmap('hsv')
+
+n = 15
+
+
+for i in range(n+1):
+    for j in range(i):
+        
+        if i == n:
+            plt.bar(x=i,
+                    height=y[j]/np.sum(y[:i]),
+                    bottom=np.sum(y[:j])/np.sum(y[:i]),
+                    color = cmap(j/(n+1)),
+                    label=f'd = {j+1}')
+        else:
+            plt.bar(x=i,
+                    height=y[j]/np.sum(y[:i]),
+                    bottom=np.sum(y[:j])/np.sum(y[:i]),
+                    color = cmap(j/(n+2)))
+            
+            
+plt.xlim(0,n+1)
+plt.xticks(np.arange(1,n+1,1), rotation=90)
+plt.yticks(np.linspace(0,1,11), np.linspace(0,100,11).astype(int))
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.xlabel('Radius Neighbour Regressor radius limit')
+plt.ylabel('Datapoint weights, percent')
+plt.tight_layout()
+
+plt.grid()
+plt.savefig('Cumulative weights.pdf')

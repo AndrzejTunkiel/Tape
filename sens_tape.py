@@ -50,7 +50,8 @@ def tape(data,
                    shift = 0.1,
                    resample='radius',
                    resample_coef = 1,
-                   resample_weights='distance'):
+                   resample_weights='distance',
+                   smartfill = 0.9):
 
 
     df = data
@@ -276,7 +277,7 @@ def tape(data,
             dropna_diff = np.diff(dfs[attribute].dropna())
             zeros_p = np.count_nonzero(dropna_diff == 0) / len(dropna_diff)
             
-            if zeros_p > 0.9: # Threshold to check?
+            if zeros_p > smartfill: # Threshold to check?
                 fill_method[attribute] = 'ffill'
             else:
                 fill_method[attribute] = 'linterp'

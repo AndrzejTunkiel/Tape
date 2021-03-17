@@ -51,11 +51,12 @@ def tape(data,
                    resample='radius',
                    resample_coef = 1,
                    resample_weights='distance',
-                   smartfill = 0.9):
+                   smartfill = 0.9,
+                   h5prefix=''):
 
 
     df = data
-    
+   
     ## List attributes
     # print('Listing all the attributes in the loaded dataset:')
     # print(list(df))
@@ -277,7 +278,7 @@ def tape(data,
             dropna_diff = np.diff(dfs[attribute].dropna())
             zeros_p = np.count_nonzero(dropna_diff == 0) / len(dropna_diff)
             
-            if zeros_p > smartfill: # Threshold to check?
+            if zeros_p >= smartfill: # Threshold to check?
                 fill_method[attribute] = 'ffill'
             else:
                 fill_method[attribute] = 'linterp'
@@ -291,7 +292,7 @@ def tape(data,
         
         for attribute in list(dfs):
             if fill_method[attribute] == 'ffill':
-                dfs[attribute] = dfs[attribute].ffill()#.rolling(5, center=True).mean().ffill().bfill()
+                dfs[attribute] = dfs[attribute].ffill().bfill()#.rolling(5, center=True).mean().ffill().bfill()
         
     #%%
     
@@ -771,7 +772,7 @@ def tape(data,
     
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=0, patience=50)
     
-    mc = ModelCheckpoint('best_model.h5', monitor='val_loss',
+    mc = ModelCheckpoint(f'{h5prefix}best_model.h5', monitor='val_loss',
                                  mode='min', save_best_only=True, verbose=0)
     
 
@@ -801,7 +802,7 @@ def tape(data,
                                     epochs=2000, verbose=verbose, batch_size=32,
                                     callbacks=[es, mc])
     
-    model = load_model('best_model.h5')
+    model = load_model(f'{h5prefix}best_model.h5')
     
 
     result_test = model.evaluate(X_test_m, y_test_RNN, verbose=0)

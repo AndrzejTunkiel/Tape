@@ -115,3 +115,53 @@ axs[3].legend()
 plt.tight_layout()
 plt.savefig('resampling useful.pdf')
 plt.show()
+
+#%%
+# data = pd.read_csv('f9ad.csv')
+# np.max(data.iloc[2000:10000]['Measured Depth m'].ffill().diff())
+plt.figure(figsize=(4,3))
+import seaborn as sns
+df = pd.read_csv('hstep_extension_study.csv')
+
+results = []
+maxstep = int(np.max(df['hstep_extension']))
+for i in range(0,maxstep):
+    results.append(np.average(df[df['hstep_extension'] == i+1]['MAE']))
+    
+plt.grid
+plt.scatter(x = np.arange(1,maxstep+1,1), y=results, marker="x", c='black', s=20)
+plt.grid()
+n = 10
+xticklabels = np.linspace(0.153, 0.153*maxstep,n)
+xticklabels = np.round(xticklabels, 2)
+
+plt.xticks(np.linspace(1,maxstep+1,n), xticklabels, rotation=90)
+plt.xlabel('Resampling step length [m]')
+plt.ylabel('Mean Absolute Error [deg]')
+plt.tight_layout()
+plt.savefig('hstep_extension.pdf')
+
+#%%
+plt.figure(figsize=(4,3))
+import seaborn as sns
+df = pd.read_csv('filling_study.csv')
+
+
+
+
+
+sns.boxplot(x=df['smartfill'], y=df['MAE'],color='gray' )
+labels = np.round(np.linspace(0,1,11),1).astype(str)
+
+labels[0] = 'FF only'
+labels[-1]= 'LI only'
+plt.xticks(np.linspace(0,10,11),
+           labels,
+           rotation=90)
+plt.xlabel('smartfil threshold')
+#plt.xticks(np.linspace(0,11,11), np.linspace(0,1,11))
+
+plt.ylabel('Mean Absolute Error [deg]')
+plt.tight_layout()
+
+plt.savefig('smartfill_study.pdf')

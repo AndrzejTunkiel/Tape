@@ -120,8 +120,9 @@ plt.show()
 
 #%%
 
-plt.figure(figsize=(5,4))
-
+plt.figure(figsize=(6,4))
+plt.rc('axes', axisbelow=True)
+plt.grid(linewidth=1, color='gray')
 x = np.arange(1,101,1)
 y = 1/x
 
@@ -140,12 +141,14 @@ for i in range(n+1):
                     height=y[j]/np.sum(y[:i]),
                     bottom=np.sum(y[:j])/np.sum(y[:i]),
                     color = cmap(j/(n+1)),
-                    label=f'd = {j+1}')
+                    label=f'd = {j+1}',
+                    edgecolor='black')
         else:
             plt.bar(x=i,
                     height=y[j]/np.sum(y[:i]),
                     bottom=np.sum(y[:j])/np.sum(y[:i]),
-                    color = cmap(j/(n+2)))
+                    color = cmap(j/(n+2)),
+                    edgecolor='black')
             
             
 plt.xlim(0,n+1)
@@ -156,5 +159,49 @@ plt.xlabel('Radius Neighbour Regressor radius limit')
 plt.ylabel('Datapoint weights, percent')
 plt.tight_layout()
 
-plt.grid()
+#plt.grid()
 plt.savefig('Cumulative weights.pdf')
+
+#%%
+
+plt.figure(figsize=(6,4))
+plt.rc('axes', axisbelow=True)
+plt.grid(linewidth=1, color='gray')
+x = np.ones(100)
+y = x
+
+import matplotlib
+
+cmap = matplotlib.cm.get_cmap('hsv')
+
+n = 15
+
+
+for i in range(n+1):
+    for j in range(i):
+        
+        if i == n:
+            plt.bar(x=i,
+                    height=y[j]/np.sum(y[:i]),
+                    bottom=np.sum(y[:j])/np.sum(y[:i]),
+                    color = cmap(j/(n+1)),
+                    label=f'd = {j+1}',
+                    edgecolor='black')
+        else:
+            plt.bar(x=i,
+                    height=y[j]/np.sum(y[:i]),
+                    bottom=np.sum(y[:j])/np.sum(y[:i]),
+                    color = cmap(j/(n+2)),
+                    edgecolor='black')
+            
+            
+plt.xlim(0,n+1)
+plt.xticks(np.arange(1,n+1,1), rotation=90)
+plt.yticks(np.linspace(0,1,11), np.linspace(0,100,11).astype(int))
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.xlabel('Radius Neighbour Regressor radius limit')
+plt.ylabel('Datapoint weights, percent')
+plt.tight_layout()
+
+
+plt.savefig('Cumulative weights2.pdf')

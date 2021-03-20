@@ -120,7 +120,7 @@ plt.show()
 
 #%%
 
-plt.figure(figsize=(6,4))
+plt.figure(figsize=(5,4))
 plt.rc('axes', axisbelow=True)
 plt.grid(linewidth=1, color='gray')
 x = np.arange(1,101,1)
@@ -164,7 +164,7 @@ plt.savefig('Cumulative weights.pdf')
 
 #%%
 
-plt.figure(figsize=(6,4))
+plt.figure(figsize=(5,4))
 plt.rc('axes', axisbelow=True)
 plt.grid(linewidth=1, color='gray')
 x = np.ones(100)

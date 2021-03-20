@@ -139,6 +139,7 @@ plt.xticks(np.linspace(1,maxstep+1,n), xticklabels, rotation=90)
 plt.xlabel('Resampling step length [m]')
 plt.ylabel('Mean Absolute Error [deg]')
 plt.tight_layout()
+
 plt.savefig('hstep_extension.pdf')
 
 #%%
@@ -163,5 +164,5 @@ plt.xlabel('smartfil threshold')
 
 plt.ylabel('Mean Absolute Error [deg]')
 plt.tight_layout()
-
+plt.grid()
 plt.savefig('smartfill_study.pdf')

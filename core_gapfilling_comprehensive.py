@@ -21,7 +21,7 @@ splits = np.linspace(0.15, 0.8, 50)
 
 df = pd.DataFrame(columns=['smartfill', 'MAE'])
 
-smartfills = np.linspace(0,1,11)
+smartfills = np.linspace(0,1.00001,11)
 
 while True:
     for smartfill in smartfills:

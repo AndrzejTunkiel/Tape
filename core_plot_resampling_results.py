@@ -124,13 +124,34 @@ import seaborn as sns
 df = pd.read_csv('hstep_extension_study.csv')
 
 results = []
+p95 = []
+p5 = []
 maxstep = int(np.max(df['hstep_extension']))
 for i in range(0,maxstep):
     results.append(np.average(df[df['hstep_extension'] == i+1]['MAE']))
+    p95.append(np.percentile(df[df['hstep_extension'] == i+1]['MAE'],95))
+    p5.append(np.percentile(df[df['hstep_extension'] == i+1]['MAE'],5))
     
-plt.grid
-plt.scatter(x = np.arange(1,maxstep+1,1), y=results, marker="x", c='black', s=20)
+#plt.grid
+#plt.scatter(x = np.arange(1,maxstep+1,1), y=results, marker="x",
+#            c='red', s=20)
+
+plt.plot(np.arange(1,maxstep+1,1), results, c='black',
+         linestyle = '-', label='average', linewidth=2)
+#plt.plot(np.arange(1,maxstep+1,1), p95, c='red')
+#plt.plot(np.arange(1,maxstep+1,1), p5, c='red')
+
+plt.scatter(x = df['hstep_extension'], y=df['MAE'], s=4, alpha=0.5, c='black')
 plt.grid()
+# plt.scatter([],[], marker="x",
+#             c='red', s=20,
+#             label='Average result')
+
+plt.scatter([],[],
+            c='black', s=1,
+            label='Individual result')
+plt.legend()
+#plt.grid()
 n = 10
 xticklabels = np.linspace(0.153, 0.153*maxstep,n)
 xticklabels = np.round(xticklabels, 2)
@@ -143,7 +164,52 @@ plt.tight_layout()
 plt.savefig('hstep_extension.pdf')
 
 #%%
-plt.figure(figsize=(4,3))
+
+fig, ax = plt.subplots(figsize=(4,3))
+
+df = pd.read_csv('f9ad.csv')
+
+df = df.iloc[2000:10000]
+
+cols = ['Measured Depth m', 'TOFB s', 'AVG_CONF unitless', 'MIN_CONF unitless', 'Average Rotary Speed rpm', 'STUCK_RT unitless', 'Corrected Surface Weight on Bit kkgf', 'Corrected Total Hookload kkgf', 'MWD Turbine RPM rpm', 'MWD Raw Gamma Ray 1/s', 'MWD Continuous Inclination dega', 'Pump 2 Stroke Rate 1/min', 'Rate of Penetration m/h', 'Bit Drill Time h', 'Corrected Hookload kkgf', 'MWD GR Bit Confidence Flag %', 'Pump Time h', 'PowerUP Shock Rate 1/s', 'Total SPM 1/min', 'Average Hookload kkgf', 'Total Hookload kkgf', 'Extrapolated Hole TVD m', 'MWD Gamma Ray (API BH corrected) gAPI', 'EDRT unitless', 'Pump 1 Stroke Rate 1/min', 'Total Bit Revolutions unitless', 'Mud Density In g/cm3.1', 'Weight on Bit kkgf', 'Hole Depth (TVD) m', 'MWD Shock Risk unitless', 'Bit run number unitless', 'Inverse ROP s/m', 'Pump 4 Stroke Rate 1/min', 'Rig Mode unitless', 'MWD Shock Peak m/s2', 'SPN Sp_RigMode 2hz unitless', 'Average Standpipe Pressure kPa', 'Rate of Penetration (5ft avg) m/h', 'AJAM_MWD unitless', '1/2ft ROP m/h', 'Hole depth (MD) m', 'Mud Flow In L/min', 'BHFG unitless', 'MWD DNI Temperature degC', 'Average Surface Torque kN.m', 'Total Downhole RPM rpm', 'SHK3TM_RT min', 'Pump 3 Stroke Rate 1/min', 'Inverse ROP (5ft avg) s/m', 'S1AC kPa', 'S2AC kPa', 'IMWT g/cm3', 'OSTM s']
+
+df = df[cols]
+smartfills = np.linspace(0,1.0000001,11)
+counts = []
+percentages = []
+
+for smartfill in smartfills:
+    fill_method = []
+    
+    for attribute in list(df):
+                
+        try:
+            dropna_diff = np.diff(df[attribute].dropna())
+        
+            try:
+                zeros_p = np.count_nonzero(dropna_diff == 0) / len(dropna_diff)
+                
+                if zeros_p >= smartfill: # Threshold to check?
+                    fill_method.append(1)
+                else:
+                    fill_method.append(0)
+            except:
+                pass
+                #print(f'{attribute} failed 1')
+        except:
+            pass
+            #print(f'{attribute} failed 2')
+            
+    #print(smartfill)        
+    #print(f'Average {np.mean(fill_method)}')
+    #print(f'Count {np.sum(fill_method)}')
+    counts.append(np.sum(fill_method))
+    percentages.append(np.mean(fill_method))
+
+percentages = np.asarray(percentages)
+percentages = percentages*100
+
+#plt.figure(figsize=(4,3))
 import seaborn as sns
 df = pd.read_csv('filling_study.csv')
 
@@ -151,18 +217,111 @@ df = pd.read_csv('filling_study.csv')
 
 
 
-sns.boxplot(x=df['smartfill'], y=df['MAE'],color='gray' )
-labels = np.round(np.linspace(0,1,11),1).astype(str)
+ax = sns.boxplot(x=df['smartfill'], y=df['MAE'],color='gray' )
+labels = np.round(np.linspace(0,100,11),0).astype(int)
 
-labels[0] = 'FF only'
-labels[-1]= 'LI only'
+#labels[0] = 'FF only'
+#labels[-1]= 'LI only'
 plt.xticks(np.linspace(0,10,11),
            labels,
            rotation=90)
-plt.xlabel('smartfil threshold')
+plt.xlabel('''Gap filling algorithm selection threshold [%]''')
 #plt.xticks(np.linspace(0,11,11), np.linspace(0,1,11))
 
 plt.ylabel('Mean Absolute Error [deg]')
 plt.tight_layout()
 plt.grid()
+
+ax2 = ax.twinx() 
+
+ax2.plot(percentages, color='red', linestyle = '--', label='percent FFilled',
+         linewidth=2)
+ax2.set_ylabel('Percentage of attributes \n forward-filled', color='red')
+ax2.tick_params(axis='y', labelcolor='red')
 plt.savefig('smartfill_study.pdf')
+plt.show()
+A = df[np.round(df['smartfill'],1) == 0.6]['MAE'].to_list()
+B = df[np.round(df['smartfill'],1) == 0.2]['MAE'].to_list()
+from scipy import stats
+t_check=stats.ttest_ind(A,B)
+print(t_check[1])
+
+#%%
+
+df = pd.read_csv('selstrat_study.csv')
+plt.figure(figsize=(5,5))
+strategies = ['ppscore', 'pearson', 'pca']
+
+colors = {'ppscore' : 'tab:orange',
+          'pearson' : 'tab:green',
+          'pca' : 'tab:blue'}
+
+labels = {'ppscore' : 'mean ppscore',
+          'pearson' : 'mean pearson',
+          'pca' : 'mean pca'}
+
+for strategy in strategies:
+    averages = []
+    unique = np.unique(df[df['strategy'] == strategy]['qty'])
+    for qty in unique:
+        dft = df[df['strategy'] == strategy]
+        dft = dft[dft['qty'] == qty]
+        averages.append(np.mean(dft['MAE']))
+        
+    plt.plot(averages, c=colors[strategy], linestyle='--',
+             linewidth=2, label=labels[strategy])
+
+
+#sns.boxplot(data = df, x='qty', y='MAE', hue = 'strategy')
+
+sns.swarmplot(data = df, x='qty', y='MAE', hue = 'strategy', s=6, dodge=False)
+plt.grid()
+
+handles, labels = plt.gca().get_legend_handles_labels()
+
+order = [2,0,1,3,4,5]
+
+plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], 
+           bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
+plt.xlabel('Parameter quantity')
+plt.ylabel('Mean Absolute Error [degrees]')
+plt.tight_layout()
+plt.savefig('selstrat_lcs.pdf')
+plt.show()
+#%%
+
+df = pd.read_csv('selstrat_study_delta.csv')
+plt.figure(figsize=(5,5))
+strategies = ['ppscore', 'pearson', 'pca']
+colors = {'ppscore' : 'tab:orange',
+          'pearson' : 'tab:green',
+          'pca' : 'tab:blue'}
+
+labels = {'ppscore' : 'mean ppscore',
+          'pearson' : 'mean pearson',
+          'pca' : 'mean pca'}
+for strategy in strategies:
+    averages = []
+    unique = np.unique(df[df['strategy'] == strategy]['qty'])
+    for qty in unique:
+        dft = df[df['strategy'] == strategy]
+        dft = dft[dft['qty'] == qty]
+        averages.append(np.average(dft['MAE']))
+        
+    plt.plot(averages, c=colors[strategy], linestyle='--', 
+             linewidth=2, label=labels[strategy])
+
+#sns.boxplot(data = df, x='qty', y='MAE', hue = 'strategy')
+
+sns.swarmplot(data = df, x='qty', y='MAE', hue = 'strategy', s=6, dodge=False)
+plt.grid()
+plt.xlabel('Parameter quantity')
+plt.ylabel('Mean Absolute Error [degrees]')
+handles, labels = plt.gca().get_legend_handles_labels()
+
+order = [2,0,1,3,4,5]
+
+plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], 
+           bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
+plt.tight_layout()
+plt.savefig('selstrat_lcs_delta.pdf')

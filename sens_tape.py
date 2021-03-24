@@ -249,7 +249,7 @@ def tape(data,
         killed_cols = pd.DataFrame(killed_cols, columns=['Name','Percent offending'])
         #print('Removed following columns due to outlier gap (showing under 15% only):')
         #print(killed_cols.sort_values(by='Percent offending')[killed_cols['Percent offending'] < 15])
-        
+
         #%%
         
         ## Checking if first derivative of index is stable.

@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neighbors import RadiusNeighborsRegressor
 from sklearn.neighbors import KNeighborsRegressor
+plt.style.use(['science','no-latex'])
 #%%
 extensions = np.linspace(1,10,100)
 
@@ -19,12 +20,12 @@ start = 0
 stop = 5
 samples = 100
 
-sto=100
+sto=1
 
 carlo = 10*sto
 
 
-fig, axs = plt.subplots(2,2, figsize = (6,8), sharey=True)
+fig, axs = plt.subplots(2,2, figsize = (5,6), sharey=True)
 global_results = []
 global_p95 = []
 global_p5 = []
@@ -78,7 +79,7 @@ axs[0,0].set_ylabel('Mean Absolute Error')
 axs[0,0].grid()
 
 axs[0,0].set_axisbelow(True)
-axs[0,0].title.set_text('RadiusNeighborsRegressor,\nweights=distance')
+axs[0,0].title.set_text('RadiusNeighbors\nRegressor,\nweights=distance')
 axs[0,0].axhline(y=0.199, xmin=0, xmax=1, color='black', linewidth=1,
                  label='no resampling,\naverage')
 axs[0,0].axhline(y=0.101, xmin=0, xmax=1, color='black', linewidth=1,
@@ -141,7 +142,7 @@ axs[0,1].set_xlabel('Radius multiplier')
 
 axs[0,1].grid()
 axs[0,1].set_axisbelow(True)
-axs[0,1].title.set_text('RadiusNeighborsRegressor,\nweights=uniform')
+axs[0,1].title.set_text('RadiusNeighbors\nRegressor,\nweights=uniform')
 axs[0,1].axhline(y=0.199, xmin=0, xmax=1, color='black', linewidth=1,
                  label='no resampling,\naverage')
 axs[0,1].axhline(y=0.101, xmin=0, xmax=1, color='black', linewidth=1,
@@ -187,10 +188,10 @@ for i in extensions:
     global_p95.append(np.percentile(local_results,95))
     
     
-axs[1,0].scatter(extensions, global_results, marker = '.', label='mean',
+axs[1,0].scatter(extensions, global_results, marker = '.', #label='mean',
                c='black', s=10)
 
-axs[1,0].scatter(extensions, global_p5, marker = '_', label='5th/95th percentile',
+axs[1,0].scatter(extensions, global_p5, marker = '_', #label='5th/95th percentile',
                c='gray', s=10)
 
 axs[1,0].scatter(extensions, global_p95, marker = '_',
@@ -200,7 +201,7 @@ axs[1,0].set_xlabel('Neighbour count')
 axs[1,0].grid()
 axs[1,0].set_ylabel('Mean Absolute Error')
 axs[1,0].set_axisbelow(True)
-axs[1,0].title.set_text('KNeighborsRegressor,\nweights=distance')
+axs[1,0].title.set_text('KNeighbors\nRegressor,\nweights=distance')
 axs[1,0].axhline(y=0.199, xmin=0, xmax=1, color='black', linewidth=1,
                  label='no resampling,\naverage')
 axs[1,0].axhline(y=0.101, xmin=0, xmax=1, color='black', linewidth=1,
@@ -260,13 +261,13 @@ axs[1,1].set_xlabel('Neighbour count')
 axs[1,1].grid()
 
 axs[1,1].set_axisbelow(True)
-axs[1,1].title.set_text('KNeighborsRegressor,\nweights=uniform')
-axs[1,1].axhline(y=0.199, xmin=0, xmax=1, color='black', linewidth=1,
-                 label='no resampling,\naverage')
-axs[1,1].axhline(y=0.101, xmin=0, xmax=1, color='black', linewidth=1,
-                 label='no resampling,\n5th/95th percentile', linestyle = '--')
+axs[1,1].title.set_text('KNeighbors\nRegressor,\nweights=uniform')
+axs[1,1].axhline(y=0.199, xmin=0, xmax=1, color='black', linewidth=1)
+                 #label='no resampling,\naverage')
+axs[1,1].axhline(y=0.101, xmin=0, xmax=1, color='black', linewidth=1, linestyle = '--')
+                 #label='no resampling,\n5th/95th percentile',)
 axs[1,1].axhline(y=0.35, xmin=0, xmax=1, color='black', linewidth=1, linestyle = '--')
-#axs[1,1].legend()
+axs[1,1].legend()
 
 # from statsmodels.nonparametric.smoothers_lowess import lowess
 
@@ -359,7 +360,7 @@ x_uniform = np.linspace(start, stop , samples)
 
 y_reg = reg.predict(x_uniform.reshape(-1,1))
 
-fig,ax = plt.subplots(1, figsize=(6,4))
+fig,ax = plt.subplots(1, figsize=(5,4))
 
 #plt.scatter(x_uniform, y, s=10, c='blue', marker='v', label='raw, unindexed')
 plt.plot(x_uniform, y, linewidth=0.5, c='blue', alpha=0.5,  marker='v',
@@ -373,7 +374,7 @@ handles,labels = ax.get_legend_handles_labels()
 
 handles = [handles[1], handles[3], handles[0], handles[2]]
 labels = [labels[1], labels[3], labels[0], labels[2]]
-plt.legend(handles, labels)
+plt.legend(handles, labels, loc='lower left')
 plt.grid()
 plt.xlabel('x\n[index]')
 plt.ylabel('y=sin(x)')

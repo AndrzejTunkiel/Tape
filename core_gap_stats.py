@@ -10,7 +10,7 @@ from statistics_module import stats
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
+plt.style.use(['science','no-latex'])
 df = pd.read_csv('f9ad.csv')
 #%%
 s, m, per = stats(df)

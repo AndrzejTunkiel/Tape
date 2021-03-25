@@ -10,7 +10,7 @@ andrzej.t.tunkiel@uis.no
 import pandas as pd
 import numpy as np
 from sens_tape import tape
-
+h5prefix = input('Unique prefix for model save file h5: ')
 data = pd.read_csv('f9ad.csv')
 
 drops = ['Unnamed: 0', 'Unnamed: 0.1', 'RHX_RT unitless', 'Pass Name unitless',
@@ -41,6 +41,7 @@ while True:
                                               plot_samples = False,
                                               resample_coef=5,
                                               resample_weights='distance',
+                                              h5prefix=h5prefix,
                                               hstep_extension = 5,
                                               smartfill=smartfill)
             

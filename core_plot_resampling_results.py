@@ -9,7 +9,7 @@ Created on Fri Mar 12 09:54:29 2021
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
+plt.style.use(['science'])
 df = pd.read_csv('resampling_study.csv')
 
 resampling = ['radius', 'knn']
@@ -136,7 +136,7 @@ for i in range(0,maxstep):
 #plt.scatter(x = np.arange(1,maxstep+1,1), y=results, marker="x",
 #            c='red', s=20)
 
-plt.plot(np.arange(1,maxstep+1,1), results, c='black',
+plt.plot(np.arange(1,maxstep+1,1), results, c='blue',
          linestyle = '-', label='average', linewidth=2)
 #plt.plot(np.arange(1,maxstep+1,1), p95, c='red')
 #plt.plot(np.arange(1,maxstep+1,1), p5, c='red')
@@ -240,7 +240,7 @@ ax2.set_ylabel('Percentage of attributes \n forward-filled', color='red')
 ax2.tick_params(axis='y', labelcolor='red')
 plt.savefig('smartfill_study.pdf')
 plt.show()
-A = df[np.round(df['smartfill'],1) == 0.6]['MAE'].to_list()
+A = df[np.round(df['smartfill'],1) == 1]['MAE'].to_list()
 B = df[np.round(df['smartfill'],1) == 0.2]['MAE'].to_list()
 from scipy import stats
 t_check=stats.ttest_ind(A,B)

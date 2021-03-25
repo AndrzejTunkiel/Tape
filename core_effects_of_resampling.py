@@ -12,7 +12,7 @@ import numpy as np
 import seaborn as sns
 
 import matplotlib.pyplot as plt
-
+plt.style.use(['science','no-latex'])
 data = pd.read_csv('f9ad.csv')
 
 drops = ['Unnamed: 0', 'Unnamed: 0.1', 'RHX_RT unitless', 'Pass Name unitless',

@@ -203,11 +203,11 @@ def tape(data,
         strides = np.asarray(strides)
         strides = strides[strides[:,2].argsort()][::-1] # sort by length [2] 
                                                         # and reverse
-        # print(f'''Proposed range to use is row {strides[0,0]} to row {strides[0,1]}
-        # for total of {strides[0,0]} rows
-        #       ''')
-        # print(f'All found strides are: [start, stop, length]')
-        # print(strides)
+        print(f'''Proposed range to use is row {strides[0,0]} to row {strides[0,1]}
+        for total of {strides[0,0]} rows
+              ''')
+        print(f'All found strides are: [start, stop, length]')
+        print(strides)
         
         s_start = strides[0,0]
         s_stop = strides[0,1]

@@ -10,7 +10,7 @@ andrzej.t.tunkiel@uis.no
 import pandas as pd
 import numpy as np
 from sens_tape import tape
-
+h5prefix = input('Unique prefix for model save file h5: ')
 data = pd.read_csv('f9ad.csv')
 
 drops = ['Unnamed: 0', 'Unnamed: 0.1', 'RHX_RT unitless', 'Pass Name unitless',
@@ -19,7 +19,7 @@ drops = ['Unnamed: 0', 'Unnamed: 0.1', 'RHX_RT unitless', 'Pass Name unitless',
 
 splits = np.linspace(0.15, 0.8, 50)
 
-df = pd.DataFrame(columns=['hstep_extension', 'MAE'])
+
 
 hstep_extensions = np.arange(1,51,1)
 
@@ -42,7 +42,7 @@ while True:
                                               resample_coef=5,
                                               resample_weights='distance',
                                               hstep_extension = hstep_extension,
-                                              h5prefix = '')
+                                              h5prefix=h5prefix)
             
             truth_array.append(truth)
             pred_array.append(pred)
@@ -53,9 +53,9 @@ while True:
         
         for i in range(len(truth_array)):
             diffs.append(np.average(np.abs(truth_array[i] - pred_array[i]), axis=0))
-            
+        df = pd.DataFrame(columns=['hstep_extension', 'MAE'])    
         new_row = {'hstep_extension' : hstep_extension,
                    'MAE' : np.average(diffs)}
         df = df.append(new_row, ignore_index = True)
-        df.to_csv('hstep_extension_study.csv')
+        df.to_csv('hstep_extension_study.csv', mode='a', header=False, index=False)
 

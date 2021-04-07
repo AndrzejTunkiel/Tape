@@ -9,7 +9,7 @@ Created on Fri Mar 12 09:54:29 2021
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-plt.style.use(['science'])
+plt.style.use(['science','no-latex'])
 df = pd.read_csv('resampling_study.csv')
 
 resampling = ['radius', 'knn']
@@ -136,7 +136,7 @@ for i in range(0,maxstep):
 #plt.scatter(x = np.arange(1,maxstep+1,1), y=results, marker="x",
 #            c='red', s=20)
 
-plt.plot(np.arange(1,maxstep+1,1), results, c='blue',
+plt.plot(np.arange(1,maxstep+1,1), results, c='tab:blue',
          linestyle = '-', label='average', linewidth=2)
 #plt.plot(np.arange(1,maxstep+1,1), p95, c='red')
 #plt.plot(np.arange(1,maxstep+1,1), p5, c='red')
@@ -157,7 +157,7 @@ xticklabels = np.linspace(0.153, 0.153*maxstep,n)
 xticklabels = np.round(xticklabels, 2)
 
 plt.xticks(np.linspace(1,maxstep+1,n), xticklabels, rotation=90)
-plt.xlabel('Resampling step length [m]')
+plt.xlabel('Re-sampling rate [m]')
 plt.ylabel('Mean Absolute Error [deg]')
 plt.tight_layout()
 
@@ -249,16 +249,19 @@ print(t_check[1])
 #%%
 
 df = pd.read_csv('selstrat_study.csv')
-plt.figure(figsize=(5,5))
-strategies = ['ppscore', 'pearson', 'pca']
 
-colors = {'ppscore' : 'tab:orange',
-          'pearson' : 'tab:green',
-          'pca' : 'tab:blue'}
+df['strategy'] = df['strategy'].replace(['pca'],'PCA')
+
+plt.figure(figsize=(5,5))
+strategies = ['ppscore', 'pearson', 'PCA']
+
+colors = {'ppscore' : 'tab:green',
+          'pearson' : 'tab:orange',
+          'PCA' : 'tab:blue'}
 
 labels = {'ppscore' : 'mean ppscore',
           'pearson' : 'mean pearson',
-          'pca' : 'mean pca'}
+          'PCA' : 'mean PCA'}
 
 for strategy in strategies:
     averages = []
@@ -279,7 +282,7 @@ plt.grid()
 
 handles, labels = plt.gca().get_legend_handles_labels()
 
-order = [2,0,1,3,4,5]
+order = [1,0,2,5,4,3]
 
 plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], 
            bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
@@ -292,14 +295,18 @@ plt.show()
 
 df = pd.read_csv('selstrat_study_delta.csv')
 plt.figure(figsize=(5,5))
-strategies = ['ppscore', 'pearson', 'pca']
-colors = {'ppscore' : 'tab:orange',
-          'pearson' : 'tab:green',
-          'pca' : 'tab:blue'}
+df['strategy'] = df['strategy'].replace(['pca'],'PCA')
+
+plt.figure(figsize=(5,5))
+strategies = ['ppscore', 'pearson', 'PCA']
+
+colors = {'ppscore' : 'tab:green',
+          'pearson' : 'tab:orange',
+          'PCA' : 'tab:blue'}
 
 labels = {'ppscore' : 'mean ppscore',
           'pearson' : 'mean pearson',
-          'pca' : 'mean pca'}
+          'PCA' : 'mean PCA'}
 for strategy in strategies:
     averages = []
     unique = np.unique(df[df['strategy'] == strategy]['qty'])
@@ -319,7 +326,7 @@ plt.xlabel('Parameter quantity')
 plt.ylabel('Mean Absolute Error [degrees]')
 handles, labels = plt.gca().get_legend_handles_labels()
 
-order = [2,0,1,3,4,5]
+order = [1,0,2,5,4,3]
 
 plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], 
            bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)

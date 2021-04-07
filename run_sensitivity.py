@@ -23,6 +23,20 @@ truth, pred, columns, score = tape(data, split=1,
                                   target =  'MWD Continuous Inclination dega',
                                   convert_to_diff = [],
                                   lcs_list = ['MWD Continuous Inclination dega'])
+
+
+#%%
+
+
+
+truth, pred, columns, score = tape(data, split=1,
+                                  drops=drops,
+                                  index = 'Measured Depth m',
+                                  target =  'MWD Continuous Inclination dega',
+                                  convert_to_diff = [],
+                                  lcs_list = ['MWD Continuous Inclination dega'],
+                                  hstep_extension = 2)
+
 #%%
 
 truth, pred, columns, score  = tape(data, split=1,

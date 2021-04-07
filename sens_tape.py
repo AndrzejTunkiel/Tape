@@ -43,7 +43,7 @@ def tape(data,
                    imagination_meters = 25,
                    verbose=0,
                    future = 0.15,
-                   plot_samples = True,
+                   plot_samples = False,
                    convert_to_diff = [],
                    lcs_list = [],
                    clean=False,
@@ -808,7 +808,8 @@ def tape(data,
     result_test = model.evaluate(X_test_m, y_test_RNN, verbose=0)
     
     
-    if split == 1:
+    if split == 1: # sensitivity enable!
+        plt.style.use(['science','no-latex'])
         singular_sensitivity = []
         if PCA_n != -1:
             for i in range(pca.n_features_):
@@ -843,15 +844,36 @@ def tape(data,
                 perc75 = np.percentile(sens,75,axis=0)
                 perc95 = np.percentile(sens,95,axis=0)
                 
-                
+                plt.figure(figsize=(4,3))
                 #plt.plot(ave, linewidth=2, color='darkblue')
                 plt.plot(perc5, linewidth=1, linestyle=":", color='black')
                 plt.plot(perc25, linewidth=1, color='black')
                 plt.plot(perc50, linewidth=2, color='black')
                 plt.plot(perc75, linewidth=1, color='black')
                 plt.plot(perc95, linewidth=1, linestyle=":", color='black')
-                plt.title(pca_allattr[i])
+                #plt.title(pca_allattr[i])
                 plt.grid()
+                plt.tight_layout()
+                
+                
+                plt.plot([],[],linewidth=1, linestyle=":", color='black',
+                         label='$5^{th}$; $95^{th}$ percentile')
+                
+                plt.plot([],[],linewidth=1, color='black',
+                         label='$25^{th}$; $75^{th}$ percentile')
+                
+                plt.plot([],[],linewidth=2, color='black',
+                         label='$50^{th}$ percentile')
+                
+                plt.legend()
+                plt.ylabel(f'Sensitivity Index\n[{pca_allattr[i]}]')
+                plt.xlabel('Output\nPrediction distance [m]')
+                
+                myticks = np.linspace(0,len(perc5),6)
+                mylabels = np.linspace(0,imagination_meters,6).astype(int)
+                plt.xticks(myticks, mylabels)
+                
+                plt.savefig(f'{pca_allattr[i].replace("/","")}.pdf')
                 plt.show()
                 singular_sensitivity.append(np.average((results_plus - results_minus)/2))
                 
@@ -886,15 +908,35 @@ def tape(data,
                 perc75 = np.percentile(sens,75,axis=0)
                 perc95 = np.percentile(sens,95,axis=0)
                 
-                
+                plt.figure(figsize=(4,3))
                 #plt.plot(ave, linewidth=2, color='darkblue')
                 plt.plot(perc5, linewidth=1, linestyle=":", color='black')
                 plt.plot(perc25, linewidth=1, color='black')
                 plt.plot(perc50, linewidth=2, color='black')
                 plt.plot(perc75, linewidth=1, color='black')
                 plt.plot(perc95, linewidth=1, linestyle=":", color='black')
-                plt.title(pca_allattr[i])
+                #plt.title(pca_allattr[i])
                 plt.grid()
+                plt.tight_layout()
+                
+                
+                plt.plot([],[],linewidth=1, linestyle=":", color='black',
+                         label='$5^{th}$; $95^{th}$ percentile')
+                
+                plt.plot([],[],linewidth=1, color='black',
+                         label='$25^{th}$; $75^{th}$ percentile')
+                
+                plt.plot([],[],linewidth=2, color='black',
+                         label='$50^{th}$ percentile')
+                
+                plt.legend()
+                plt.ylabel(f'Sensitivity Index\n[{pca_allattr[i]}]')
+                plt.xlabel('Output\nPrediction distance [m]')
+                
+                myticks = np.linspace(0,len(perc5),6)
+                mylabels = np.linspace(0,imagination_meters,6).astype(int)
+                plt.xticks(myticks, mylabels)
+                plt.savefig(f'{pca_allattr[i].replace("/","")}.pdf')
                 plt.show()
                 singular_sensitivity.append(np.average((results_plus - results_minus)/2))
             print(singular_sensitivity)
@@ -926,16 +968,37 @@ def tape(data,
         perc75 = np.percentile(sens,75,axis=0)
         perc95 = np.percentile(sens,95,axis=0)
         
-        
+        plt.figure(figsize=(4,3))
         #plt.plot(ave, linewidth=2, color='darkblue')
         plt.plot(perc5, linewidth=1, linestyle=":", color='black')
         plt.plot(perc25, linewidth=1, color='black')
         plt.plot(perc50, linewidth=2, color='black')
         plt.plot(perc75, linewidth=1, color='black')
         plt.plot(perc95, linewidth=1, linestyle=":", color='black')
-        plt.title("RNN Input sensitivity, full channel")
+        #plt.title("RNN Input sensitivity, full channel")
         plt.grid()
+        plt.tight_layout()
+        
+                
+        plt.plot([],[],linewidth=1, linestyle=":", color='black',
+                 label='$5^{th}$; $95^{th}$ percentile')
+        
+        plt.plot([],[],linewidth=1, color='black',
+                 label='$25^{th}$; $75^{th}$ percentile')
+        
+        plt.plot([],[],linewidth=2, color='black',
+                 label='$50^{th}$ percentile')
+        
+        plt.legend()
+        plt.ylabel(f'Sensitivity Index\n[{target}]')
+        plt.xlabel('Output\nPrediction distance [m]')
+        
+        myticks = np.linspace(0,len(perc5),6)
+        mylabels = np.linspace(0,hMemoryMeters,6).astype(int)
+        plt.xticks(myticks, mylabels)
+        plt.savefig(f'1.pdf')
         plt.show()
+
         
         singular_sens_input = []
         for i in range(len(X_test_RNN_m[0])):
@@ -954,15 +1017,47 @@ def tape(data,
             
             singular_sens_input.append(np.percentile(sens,50, axis=0))
         
-        
+        plt.figure(figsize=(4,3))
         vspread = np.max(np.abs(singular_sens_input))
         sns.heatmap(np.rot90(singular_sens_input), vmin = -vspread, vmax = vspread,
-                    cmap="vlag")
+                    cmap="vlag",
+                    cbar_kws={'label': 'Sensitivity Index'})
+        
+        
+   
+        
+        len1 = len(np.rot90(singular_sens_input))
+        len2 = len(np.rot90(singular_sens_input)[0])
+
+        plt.xticks(np.linspace(0,len2,6),
+                   np.linspace(-hMemoryMeters,0,6).astype(int))
+        plt.yticks(np.linspace(0,len1,6),
+                   np.linspace(0,imagination_meters,6).astype(int))
+        plt.xlabel('RNN memory location [m]')
+        plt.ylabel('Prediction distance [m]')
+        
+        plt.savefig('2.pdf')
+ 
+
+        plt.show()
+        plt.figure(figsize=(4,3))
+        plt.plot(np.mean(singular_sens_input, axis=0), c='black')
+        plt.xticks(np.linspace(0,len1,6),
+                   np.linspace(0,imagination_meters,6).astype(int))
+        plt.xlabel('Prediction distance [m]')
+        plt.ylabel('Sensitivity Index')
+        plt.grid()
+        plt.savefig('3.pdf')
         plt.show()
         
-        plt.plot(np.mean(singular_sens_input, axis=0))
-        plt.show()
-        plt.plot(np.mean(singular_sens_input, axis=1))
+        plt.figure(figsize=(4,3))
+        plt.plot(np.mean(singular_sens_input, axis=1), c='black')
+        plt.ylabel('Sensitivity Index')
+        plt.xlabel('RNN memory location [m]')
+        plt.xticks(np.linspace(0,len2,6),
+                   np.linspace(-hMemoryMeters,0,6).astype(int))
+        plt(grid)
+        plt.savefig('4.pdf')
         plt.show()
             
             

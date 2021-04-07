@@ -136,12 +136,12 @@ for i in range(0,maxstep):
 #plt.scatter(x = np.arange(1,maxstep+1,1), y=results, marker="x",
 #            c='red', s=20)
 
-plt.plot(np.arange(1,maxstep+1,1), results, c='tab:blue',
+plt.plot(np.arange(1,maxstep+1,1), results, c='tab:red',
          linestyle = '-', label='average', linewidth=2)
 #plt.plot(np.arange(1,maxstep+1,1), p95, c='red')
 #plt.plot(np.arange(1,maxstep+1,1), p5, c='red')
 
-plt.scatter(x = df['hstep_extension'], y=df['MAE'], s=4, alpha=0.5, c='black')
+plt.scatter(x = df['hstep_extension'], y=df['MAE'], s=1, alpha=1, c='gray')
 plt.grid()
 # plt.scatter([],[], marker="x",
 #             c='red', s=20,
@@ -149,7 +149,7 @@ plt.grid()
 
 plt.scatter([],[],
             c='black', s=1,
-            label='Individual result')
+            label='individual result')
 plt.legend()
 #plt.grid()
 n = 10

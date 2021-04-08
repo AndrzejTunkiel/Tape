@@ -17,6 +17,7 @@ import tensorflow as tf
 from tensorflow.keras.utils import plot_model
 from pca_mod import shift_pca
 from pca_mod import shift
+from sklearn.preprocessing import StandardScaler
 
 #%%
 df = pd.read_csv('f9ad.csv')
@@ -52,7 +53,8 @@ def tape(data,
                    resample_coef = 1,
                    resample_weights='distance',
                    smartfill = 0.9,
-                   h5prefix=''):
+                   h5prefix='',
+                   hPcaScaler='mm'):
 
 
     df = data
@@ -439,8 +441,14 @@ def tape(data,
     
     ## Scaling the data. Note that range is decide on the training dataset only!
     
-    scaler_X = MinMaxScaler()
-    scaler_y = MinMaxScaler()
+
+    
+    if asel_choice == 'pca' and hPcaScaler == 'ss':
+        scaler_X = StandardScaler()
+        scaler_y = StandardScaler()
+    else:
+        scaler_X = MinMaxScaler()
+        scaler_y = MinMaxScaler()
     
     pca_allattr = X_train.columns
     X_train[X_train.columns] = scaler_X.fit_transform(X_train[X_train.columns])
@@ -1004,12 +1012,15 @@ def tape(data,
         for i in range(len(X_test_RNN_m[0])):
             print(".", end="")
             X_test_RNN_m_plus = X_test_RNN_m.copy()
-            X_test_RNN_m_plus[:,i] = X_test_RNN_m_plus[:,i] + 0.1
+            
+            localrange = np.abs(np.max(X_test_RNN_m_plus[:,i]) - np.min(X_test_RNN_m_plus[:,i]))
+            
+            X_test_RNN_m_plus[:,i] = X_test_RNN_m_plus[:,i] + 0.1*localrange
             X_test_m_plus = [X_test_RNN_m_plus, X_test_MLP]
             results_plus = scaler_y.inverse_transform(model.predict(X_test_m_plus))
             
             X_test_RNN_m_minus = X_test_RNN_m.copy()
-            X_test_RNN_m_minus[:,i] = X_test_RNN_m_minus[:,i] - 0.1
+            X_test_RNN_m_minus[:,i] = X_test_RNN_m_minus[:,i] - 0.1*localrange
             X_test_m_minus = [X_test_RNN_m_minus, X_test_MLP]
             results_minus = scaler_y.inverse_transform(model.predict(X_test_m_minus))
             
@@ -1056,7 +1067,7 @@ def tape(data,
         plt.xlabel('RNN memory location [m]')
         plt.xticks(np.linspace(0,len2,6),
                    np.linspace(-hMemoryMeters,0,6).astype(int))
-        plt(grid)
+        plt.grid()
         plt.savefig('4.pdf')
         plt.show()
             

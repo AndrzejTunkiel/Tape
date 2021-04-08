@@ -16,12 +16,13 @@ data = pd.read_csv('f9ad.csv')
 drops = ['Unnamed: 0', 'Unnamed: 0.1', 'RHX_RT unitless', 'Pass Name unitless',
               'nameWellbore', 'name','RGX_RT unitless',
                         'MWD Continuous Azimuth dega']
-
+#%%
 truth, pred, columns, score = tape(data, split=1,
                                   drops=drops,
                                   index = 'Measured Depth m',
                                   target =  'MWD Continuous Inclination dega',
                                   convert_to_diff = [],
+                                  plot_samples = True,
                                   lcs_list = ['MWD Continuous Inclination dega'])
 
 
@@ -35,7 +36,7 @@ truth, pred, columns, score = tape(data, split=1,
                                   target =  'MWD Continuous Inclination dega',
                                   convert_to_diff = [],
                                   lcs_list = ['MWD Continuous Inclination dega'],
-                                  hstep_extension = 2)
+                                  hstep_extension = 10)
 
 #%%
 

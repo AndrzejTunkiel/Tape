@@ -250,18 +250,21 @@ print(t_check[1])
 
 df = pd.read_csv('selstrat_study.csv')
 
-df['strategy'] = df['strategy'].replace(['pca'],'PCA')
+df['strategy'] = df['strategy'].replace(['pca'],'PCA norm.')
+df['strategy'] = df['strategy'].replace(['pca_ss'],'PCA stand.')
 
 plt.figure(figsize=(5,5))
-strategies = ['ppscore', 'pearson', 'PCA']
+strategies = ['ppscore', 'pearson', 'PCA norm.', 'PCA stand.']
 
 colors = {'ppscore' : 'tab:green',
           'pearson' : 'tab:orange',
-          'PCA' : 'tab:blue'}
+          'PCA norm.' : 'tab:blue',
+          'PCA stand.' : 'tab:red'}
 
 labels = {'ppscore' : 'mean ppscore',
           'pearson' : 'mean pearson',
-          'PCA' : 'mean PCA'}
+          'PCA norm.' : 'mean PCA norm.',
+          'PCA stand.' : 'mean PCA stand.'}
 
 for strategy in strategies:
     averages = []
@@ -277,12 +280,12 @@ for strategy in strategies:
 
 #sns.boxplot(data = df, x='qty', y='MAE', hue = 'strategy')
 
-sns.swarmplot(data = df, x='qty', y='MAE', hue = 'strategy', s=6, dodge=False)
+sns.swarmplot(data = df, x='qty', y='MAE', hue = 'strategy', s=4.5, dodge=False)
 plt.grid()
 
 handles, labels = plt.gca().get_legend_handles_labels()
 
-order = [1,0,2,5,4,3]
+order = [1,0,2,3,6,5,4,7]
 
 plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], 
            bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)

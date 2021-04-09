@@ -33,7 +33,7 @@ for split in splits:
                                       target =  'MWD Continuous Inclination dega',
                                       convert_to_diff = [],
                                       lcs_list = ['MWD Continuous Inclination dega'],
-                                      plot_samples = False,
+                                      plot_samples = True,
                                       resample='radius',
                                       hPcaScaler='mm')
     

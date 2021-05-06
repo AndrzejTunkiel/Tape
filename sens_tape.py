@@ -16,7 +16,7 @@ from numpy.random import seed
 import tensorflow as tf
 from tensorflow.keras.utils import plot_model
 from pca_mod import shift_pca
-from pca_mod import shift
+from pca_mod import shift_notpca
 from sklearn.preprocessing import StandardScaler
 
 #%%
@@ -54,7 +54,8 @@ def tape(data,
                    resample_weights='distance',
                    smartfill = 0.9,
                    h5prefix='',
-                   hPcaScaler='mm'):
+                   hPcaScaler='mm',
+                   sensitivity_analysis = False):
 
 
     df = data
@@ -815,8 +816,23 @@ def tape(data,
 
     result_test = model.evaluate(X_test_m, y_test_RNN, verbose=0)
     
+    if target in convert_to_diff:
+        truth = np.cumsum(y_test_RNN/target_lcs_correction/scaler_y.scale_, axis=1)
+        pred = model.predict(X_test_m)
+        pred = np.cumsum(pred/target_lcs_correction/scaler_y.scale_, axis=1)
+        
+    else:
+        truth = y_test_RNN/target_lcs_correction/scaler_y.scale_
+        pred = model.predict(X_test_m)
+        pred = pred/target_lcs_correction/scaler_y.scale_
     
-    if split == 1: # sensitivity enable!
+    if split == 1 or sensitivity_analysis == True: # sensitivity enable!
+    
+        y_test_RNN = y_train_RNN
+        X_test_MLP = X_train_MLP
+        X_test_RNN_m = X_train_RNN_m
+        
+        senstable = {}
         plt.style.use(['science','no-latex'])
         singular_sensitivity = []
         if PCA_n != -1:
@@ -880,6 +896,8 @@ def tape(data,
                 myticks = np.linspace(0,len(perc5),6)
                 mylabels = np.linspace(0,imagination_meters,6).astype(int)
                 plt.xticks(myticks, mylabels)
+                plt.title(f'Average sensitivity = {np.average(sens)}')
+                senstable[pca_allattr[i]] = np.average(sens)
                 
                 plt.savefig(f'{pca_allattr[i].replace("/","")}.pdf')
                 plt.show()
@@ -889,13 +907,13 @@ def tape(data,
             print(pca_allattr)
         else:
             for i in range(len(keep_columns)):
-                X_test_MLP_plus = shift(X_test_MLP,
+                X_test_MLP_plus = shift_notpca(X_test_MLP,
                                            channel=i, 
                                            shift=shift)
                 X_test_m_plus = [X_test_RNN_m, X_test_MLP_plus]
                 results_plus = scaler_y.inverse_transform(model.predict(X_test_m_plus))
     
-                X_test_MLP_minus = shift(X_test_MLP,
+                X_test_MLP_minus = shift_notpca(X_test_MLP,
                                            channel=i, 
                                            shift=-shift)
                 X_test_m_minus = [X_test_RNN_m, X_test_MLP_minus]
@@ -944,6 +962,8 @@ def tape(data,
                 myticks = np.linspace(0,len(perc5),6)
                 mylabels = np.linspace(0,imagination_meters,6).astype(int)
                 plt.xticks(myticks, mylabels)
+                plt.title(f'Average sensitivity = {np.average(sens)}')
+                senstable[pca_allattr[i]] = np.average(sens)
                 plt.savefig(f'{pca_allattr[i].replace("/","")}.pdf')
                 plt.show()
                 singular_sensitivity.append(np.average((results_plus - results_minus)/2))
@@ -1004,6 +1024,10 @@ def tape(data,
         myticks = np.linspace(0,len(perc5),6)
         mylabels = np.linspace(0,hMemoryMeters,6).astype(int)
         plt.xticks(myticks, mylabels)
+        
+        plt.title(f'Average sensitivity = {np.average(sens)}')
+        
+        senstable["RNN"] = np.average(sens)
         plt.savefig(f'1.pdf')
         plt.show()
 
@@ -1046,7 +1070,7 @@ def tape(data,
                    np.linspace(0,imagination_meters,6).astype(int))
         plt.xlabel('RNN memory location [m]')
         plt.ylabel('Prediction distance [m]')
-        
+        plt.title(f'Average sensitivity = {np.average(sens)}')
         plt.savefig('2.pdf')
  
 
@@ -1058,6 +1082,7 @@ def tape(data,
         plt.xlabel('Prediction distance [m]')
         plt.ylabel('Sensitivity Index')
         plt.grid()
+        plt.title(f'Average sensitivity = {np.average(sens)}')
         plt.savefig('3.pdf')
         plt.show()
         
@@ -1068,6 +1093,7 @@ def tape(data,
         plt.xticks(np.linspace(0,len2,6),
                    np.linspace(-hMemoryMeters,0,6).astype(int))
         plt.grid()
+        plt.title(f'Average sensitivity = {np.average(sens)}')
         plt.savefig('4.pdf')
         plt.show()
             
@@ -1138,15 +1164,7 @@ def tape(data,
             plt.plot(x,pred[s], label='RNN output, predicted')
             plt.legend()
             plt.show()
-    if target in convert_to_diff:
-        truth = np.cumsum(y_test_RNN/target_lcs_correction/scaler_y.scale_, axis=1)
-        pred = model.predict(X_test_m)
-        pred = np.cumsum(pred/target_lcs_correction/scaler_y.scale_, axis=1)
-        
-    else:
-        truth = y_test_RNN/target_lcs_correction/scaler_y.scale_
-        pred = model.predict(X_test_m)
-        pred = pred/target_lcs_correction/scaler_y.scale_
+
 
     if np.isnan(result_test):
         result_test = 0
@@ -1156,7 +1174,12 @@ def tape(data,
         keep_columns = pca_allattr
     
     print(f'MAE: {np.average(np.abs(truth-pred))}')
-    return truth, pred, keep_columns, -np.log10(result_test)
+    
+    if split == 1 or sensitivity_analysis == True:
+        return truth, pred, keep_columns, -np.log10(result_test), senstable
+    
+    else:
+        return truth, pred, keep_columns, -np.log10(result_test)
 
 
 #%%

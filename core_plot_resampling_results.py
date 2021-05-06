@@ -28,14 +28,14 @@ for r in resampling:
         
         dft = df.loc[(df['resampling'] == 'no')]
         y_no = np.mean(dft['MAE'])
-        axs[i].hlines(y_no, 0, 100, label='no resampling', color='black',
+        axs[i].hlines(y_no, 0, 100, label='no resampling\nmean', color='black',
                    linewidth=1, linestyle="--")
-        # y_no = np.min(dft['MAE'])
-        # axs[i].hlines(y_no, 0, 100, label='no resampling min/max', color='black',
-        #            linewidth=0.7, linestyle='--')
-        # y_no = np.max(dft['MAE'])
-        # axs[i].hlines(y_no, 0, 100, color='black',
-        #            linewidth=0.7, linestyle='--')
+        y_no = np.percentile(dft['MAE'],5)
+        axs[i].hlines(y_no, 0, 100, label='no resampling\n$5^{th}$, $95^{th}$ perc.', color='black',
+                    linewidth=0.7, linestyle='--')
+        y_no = np.percentile(dft['MAE'],95)
+        axs[i].hlines(y_no, 0, 100, color='black',
+                    linewidth=0.7, linestyle='--')
         #axs[i].set_ylim(0.75,1.4)
         #axs[i].legend()
         axs[i].grid()
@@ -82,12 +82,12 @@ for r in resampling:
         y_no = np.mean(dft['usable'])
         axs[i].hlines(y_no, 0, 100, label='no resampling', color='black',
                    linewidth=1, linestyle="--")
-        # y_no = np.min(dft['usable'])
-        # axs[i].hlines(y_no, 0, 100, label='no resampling min/max', color='black',
-        #            linewidth=0.7, linestyle='--')
-        # y_no = np.max(dft['usable'])
-        # axs[i].hlines(y_no, 0, 100, color='black',
-        #            linewidth=0.7, linestyle='--')
+        y_no = np.percentile(dft['usable'],5)
+        axs[i].hlines(y_no, 0, 100, label='no res. min/max', color='black',
+                    linewidth=0.7, linestyle='--')
+        y_no = np.percentile(dft['usable'],95)
+        axs[i].hlines(y_no, 0, 100, color='black',
+                    linewidth=0.7, linestyle='--')
         #axs[i].set_ylim(0.75,1.4)
         #axs[i].legend()
         axs[i].grid()
@@ -225,7 +225,7 @@ labels = np.round(np.linspace(0,100,11),0).astype(int)
 plt.xticks(np.linspace(0,10,11),
            labels,
            rotation=90)
-plt.xlabel('''Gap filling algorithm selection threshold [%]''')
+plt.xlabel('''Imputation algorithm selection threshold [%]''')
 #plt.xticks(np.linspace(0,11,11), np.linspace(0,1,11))
 
 plt.ylabel('Mean Absolute Error [deg]')
@@ -335,3 +335,14 @@ plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order],
            bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
 plt.tight_layout()
 plt.savefig('selstrat_lcs_delta.pdf')
+
+#%%
+
+volve_depth = np.load('resultfile.npy')
+plt.figure(figsize=(5,5))
+plt.bar([0,1,2,3], volve_depth)
+plt.grid()
+plt.xlabel('Resampling method with lowest area between lines')
+plt.xticks([0,1,2,3], ['KNN\nuniform', 'KNN\ndistance', 'RNR\nuniform', 'RNR\ndistance'])
+plt.ylabel('Attribute count')
+plt.savefig('betweenlines.pdf')

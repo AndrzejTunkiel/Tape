@@ -363,11 +363,11 @@ y_reg = reg.predict(x_uniform.reshape(-1,1))
 fig,ax = plt.subplots(1, figsize=(5,4))
 
 #plt.scatter(x_uniform, y, s=10, c='blue', marker='v', label='raw, unindexed')
-plt.plot(x_uniform, y, linewidth=0.5, c='blue', alpha=0.5,  marker='v',
-         label='raw, unindexed', markersize=5)
-plt.scatter(x_uniform, y_reg, s=30, marker='x', c='black', label='resampled,\nunindexed')
+plt.plot(x_uniform, y, linewidth=0.5, c='red', alpha=0.5,  marker='v',
+         label='raw\nequidistant', markersize=5)
+plt.scatter(x_uniform, y_reg, s=30, marker='X', c='green', label='resampled,\nequidistant')
 
-plt.scatter(x, y, s=5, marker='o', c='red', label='raw, indexed')
+plt.scatter(x, y, s=5, marker='o', c='black', label='raw\nx-indexed')
 plt.plot(xtrue,ytrue, c='black', linestyle='--', linewidth=1, alpha=0.5, label='true signal')
 
 handles,labels = ax.get_legend_handles_labels()

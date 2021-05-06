@@ -22,6 +22,6 @@ def shift_pca(MLP, scaler, pca, channel, shift):
     
     return(MLP)
 
-def shift(MLP, channel, shift):
+def shift_notpca(MLP, channel, shift):
     MLP[:,:,channel] = MLP[:,:,channel] + shift
     return MLP

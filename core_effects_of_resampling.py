@@ -115,8 +115,345 @@ axs[1].set_title('Distance weight')
 axs[1].set_xlabel('Measured Depth [m]')
 
 
-plt.savefig('resampling_radius.pdf')
+plt.savefig('resampling_radius_rnr.pdf')
 plt.show()
+#%%
+data = pd.read_csv('f9ad.csv')
+
+drops = ['Unnamed: 0', 'Unnamed: 0.1', 'RHX_RT unitless', 'Pass Name unitless',
+              'nameWellbore', 'name','RGX_RT unitless',
+                        'MWD Continuous Azimuth dega']
+
+dfs = data.iloc[2000:10000]
+index = 'Measured Depth m'
+target =  'MWD Continuous Inclination dega',
+
+fig, axs = plt.subplots(1, 2, sharey=True, figsize=(8,3))
+index_dr = np.diff(dfs[index])
+
+index_mean = np.mean(index_dr)
+index_std = np.std(index_dr)
+index_maxgap = np.max(index_dr)
+h = 5
+x = np.arange(np.min(dfs[index].to_numpy()),
+              np.max(dfs[index].to_numpy()),
+              index_maxgap*h)
+
+
+from sklearn.neighbors import KNeighborsRegressor
+
+
+# raw = dfs['MWD Continuous Inclination dega'].interpolate().ffill().bfill().to_numpy()
+# reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+# y = reg.predict(x.reshape(-1,1))
+# plt.xlim(650,700)
+# plt.plot(x,y)
+# plt.plot(dfs[index].to_numpy(),raw)
+
+# plt.show()
+
+reg = KNeighborsRegressor(n_neighbors=1, weights='uniform')
+raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
+reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+y = reg.predict(x.reshape(-1,1))
+
+axs[0].plot(x,y, c='blue', linewidth=1, label='n = 1', linestyle="-")
+
+reg = KNeighborsRegressor(n_neighbors=20, weights='uniform')
+raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
+reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+y = reg.predict(x.reshape(-1,1))
+
+axs[0].plot(x,y, c='black', linewidth=1, label='n = 20', linestyle="-")
+
+reg = KNeighborsRegressor(n_neighbors=100, weights='uniform')
+raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
+reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+y = reg.predict(x.reshape(-1,1))
+
+axs[0].plot(x,y, c='black', linewidth=1, label='n = 100', linestyle="--")
+
+
+raw_x = dfs[index].to_numpy()
+axs[0].plot(raw_x,raw, c='red', linestyle=':', label='raw data')
+axs[0].grid()
+plt.tight_layout()
+axs[0].set_xlim(650,690)
+plt.ylim(0,60)
+axs[0].legend()
+axs[0].set_title('Uniform weight')
+axs[0].set_ylabel('Rate of Penetration [m/h]')
+axs[0].set_xlabel('Measured Depth [m]')
+
+
+reg = KNeighborsRegressor(n_neighbors=1, weights='distance')
+raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
+reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+y = reg.predict(x.reshape(-1,1))
+
+axs[1].plot(x,y, c='blue', linewidth=1, label='n = 1', linestyle="-")
+
+reg = KNeighborsRegressor(n_neighbors=20, weights='distance')
+raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
+reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+y = reg.predict(x.reshape(-1,1))
+
+axs[1].plot(x,y, c='black', linewidth=1, label='n = 20', linestyle="-")
+
+reg = KNeighborsRegressor(n_neighbors=100, weights='distance')
+raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
+reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+y = reg.predict(x.reshape(-1,1))
+
+axs[1].plot(x,y, c='black', linewidth=1, label='n = 100', linestyle="--")
+
+
+raw_x = dfs[index].to_numpy()
+axs[1].plot(raw_x,raw, c='red', linestyle=':', label='raw data')
+axs[1].grid()
+plt.tight_layout()
+axs[1].set_xlim(650,690)
+plt.ylim(0,60)
+
+axs[1].legend()
+axs[1].set_title('Distance weight')
+axs[1].set_xlabel('Measured Depth [m]')
+
+
+plt.savefig('resampling_radius_knn.pdf')
+plt.show()
+#%%
+from shapely.geometry import Polygon
+from shapely.geometry import LineString
+from shapely.ops import unary_union
+from shapely.ops import unary_union, polygonize
+data = pd.read_csv('f9ad.csv')
+
+drops = ['Unnamed: 0',
+         'Pass Name unitless',
+'MWD Magnetic Toolface dega',
+'nameWellbore',
+'name',
+'IMP/ARC Attenuation Conductivity 40-in. at 2 MHz mS/m',
+'ARC Annular Pressure kPa',
+'MWD Collar RPM rpm',
+'IMP/ARC Non-BHcorr Phase-Shift Resistivity 28-in. at 2 MHz ohm.m',
+'IMP/ARC Phase-Shift Conductivity 40-in. at 2 MHz mS/m',
+'Annular Temperature degC',
+'IMP/ARC Non-BHcorr Phase-Shift Resistivity 40-in. at 2 MHz ohm.m',
+'ARC Gamma Ray (BH corrected) gAPI',
+'IMP/ARC Non-BHcorr Attenuation Resistivity 40-in. at 2 MHz ohm.m',
+'MWD Stick-Slip PKtoPK RPM rpm',
+'IMP/ARC Non-BHcorr Attenuation Resistivity 28-in. at 2 MHz ohm.m',
+'IMP/ARC Phase-Shift Conductivity 28-in. at 2 MHz mS/m'  
+    ]
+
+data = data.drop(drops, axis=1)
+dfs = data#.iloc[2000:10000]
+index = 'Measured Depth m'
+target =  'Rate of Penetration m/h' #'MWD Continuous Inclination dega' 
+
+index_dr = np.diff(dfs[index])
+
+index_mean = np.mean(index_dr)
+index_std = np.std(index_dr)
+index_maxgap = np.max(index_dr)
+h = 5
+data_x = np.arange(np.min(dfs[index].to_numpy()),
+              np.max(dfs[index].to_numpy()),
+              index_maxgap*h)
+
+for target in list(data):
+    # try:
+        areas = []
+        samples = np.arange(1,200,10)
+        weightss = ['uniform', 'distance']
+        
+        for weights in weightss:
+            areas = []
+            for i in samples:
+                reg = RadiusNeighborsRegressor(radius=index_maxgap*i, weights=weights)
+                raw = dfs[target].interpolate().ffill().bfill().to_numpy()
+                reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+                data_y = reg.predict(data_x.reshape(-1,1))
+                
+                x_y_curve1 = np.rot90([data_x,data_y])
+                x_y_curve2 = np.rot90([dfs[index].to_numpy(), raw])
+                
+                
+                polygon_points = [] #creates a empty list where we will append the points to create the polygon
+                
+                for xyvalue in x_y_curve1:
+                    polygon_points.append([xyvalue[0],xyvalue[1]]) #append all xy points for curve 1
+                
+                for xyvalue in x_y_curve2[::-1]:
+                    polygon_points.append([xyvalue[0],xyvalue[1]]) #append all xy points for curve 2 in the reverse order (from last point to first point)
+                
+                for xyvalue in x_y_curve1[0:1]:
+                    polygon_points.append([xyvalue[0],xyvalue[1]]) #append the first point in curve 1 again, to it "closes" the polygon
+                
+                polygon = Polygon(polygon_points)
+                area = polygon.area
+                
+                x,y = polygon.exterior.xy
+                    # original data
+                ls = LineString(np.c_[x, y])
+                    # closed, non-simple
+                lr = LineString(ls.coords[:] + ls.coords[0:1])
+                lr.is_simple  # False
+                mls = unary_union(lr)
+                mls.geom_type  # MultiLineString'
+                
+                Area_cal =[]
+                
+                for polygon in polygonize(mls):
+                    Area_cal.append(polygon.area)
+                    Area_poly = (np.asarray(Area_cal).sum())
+                areas.append(Area_poly)
+                
+            plt.plot(samples,areas, label=f'RNR, {weights}')
+        
+        from sklearn.neighbors import KNeighborsRegressor
+        
+        ks = np.arange(1,200,10)
+        for weights in weightss:
+            areas = []
+            for i in ks:
+                reg = KNeighborsRegressor(n_neighbors=i, weights=weights)
+                raw = dfs[target].interpolate().ffill().bfill().to_numpy()
+                reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+                data_y = reg.predict(data_x.reshape(-1,1))
+                
+                x_y_curve1 = np.rot90([data_x,data_y])
+                x_y_curve2 = np.rot90([dfs[index].to_numpy(), raw])
+                
+                
+                polygon_points = [] #creates a empty list where we will append the points to create the polygon
+                
+                for xyvalue in x_y_curve1:
+                    polygon_points.append([xyvalue[0],xyvalue[1]]) #append all xy points for curve 1
+                
+                for xyvalue in x_y_curve2[::-1]:
+                    polygon_points.append([xyvalue[0],xyvalue[1]]) #append all xy points for curve 2 in the reverse order (from last point to first point)
+                
+                for xyvalue in x_y_curve1[0:1]:
+                    polygon_points.append([xyvalue[0],xyvalue[1]]) #append the first point in curve 1 again, to it "closes" the polygon
+                
+                polygon = Polygon(polygon_points)
+                area = polygon.area
+    
+                x,y = polygon.exterior.xy
+                    # original data
+                ls = LineString(np.c_[x, y])
+                    # closed, non-simple
+                lr = LineString(ls.coords[:] + ls.coords[0:1])
+                lr.is_simple  # False
+                mls = unary_union(lr)
+                mls.geom_type  # MultiLineString'
+                
+                Area_cal =[]
+                
+                for polygon in polygonize(mls):
+                    Area_cal.append(polygon.area)
+                    Area_poly = (np.asarray(Area_cal).sum())
+                areas.append(Area_poly)
+    
+               
+            plt.plot(ks,areas, label=f'KNN, {weights}')
+        
+        plt.legend()
+        plt.title(target)
+        plt.grid()
+        plt.show()
+    # except:
+    #     print(f'{target} failed for some reason')
+
+
+#%%
+
+# no poly version
+def myr2(x,y,data_x, data_y):
+  try:
+    x1 = np.max(data_x[data_x < x])
+    x2 = np.min(data_x[data_x > x])
+    
+    loc1 = np.where(data_x == x1)
+    loc2 = np.where(data_x == x2)
+
+    y1 = data_y[loc1][-1]
+    y2 = data_y[loc2][0]
+
+
+
+    m = (y1-y2)/(x1-x2)
+    b = (x1*y2 - x2*y1)/(x1-x2)
+
+    
+    y_inter = m * x + b
+
+    return np.power(y-y_inter, 2)
+  except:
+    return 0
+
+
+for target in list(data):
+    # try:
+        areas = []
+        samples = np.arange(1,50,1)
+        weightss = ['uniform', 'distance']
+        
+        for weights in weightss:
+            areas = []
+            for i in samples:
+                reg = RadiusNeighborsRegressor(radius=index_maxgap*i, weights=weights)
+                raw = dfs[target].interpolate().ffill().bfill().to_numpy()
+                reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+                data_y = reg.predict(data_x.reshape(-1,1))
+                
+                totals = []
+                for row in np.rot90([data_x,data_y]):
+                  x = row[0]
+                  y = row[1]
+                  totals.append(myr2(x,y,dfs[index].to_numpy(), raw))
+              
+              
+                Area_poly = (np.sum(totals))
+                areas.append(Area_poly)
+                
+            plt.plot(samples,areas, label=f'RNR, {weights}')
+        
+        from sklearn.neighbors import KNeighborsRegressor
+        
+        ks = np.arange(1,50,1)
+        for weights in weightss:
+            areas = []
+            for i in ks:
+                reg = KNeighborsRegressor(n_neighbors=i, weights=weights)
+                raw = dfs[target].interpolate().ffill().bfill().to_numpy()
+                reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+                data_y = reg.predict(data_x.reshape(-1,1))
+                
+                
+                totals = []
+                for row in np.rot90([data_x,data_y]):
+                  x = row[0]
+                  y = row[1]
+                  totals.append(myr2(x,y,dfs[index].to_numpy(), raw))
+              
+              
+                Area_poly = (np.sum(totals))
+                areas.append(Area_poly)
+               
+            plt.plot(ks,areas, label=f'KNN, {weights}')
+        
+        plt.legend()
+        plt.title(target)
+        plt.grid()
+        plt.show()
+    # except:
+    #     print(f'{target} failed for some reason')
+
+
 
 #%%
 

@@ -249,7 +249,7 @@ drops = ['Unnamed: 0',
     ]
 
 data = data.drop(drops, axis=1)
-dfs = data#.iloc[2000:10000]
+dfs = data.iloc[2000:10000]
 index = 'Measured Depth m'
 target =  'Rate of Penetration m/h' #'MWD Continuous Inclination dega' 
 
@@ -263,6 +263,7 @@ data_x = np.arange(np.min(dfs[index].to_numpy()),
               np.max(dfs[index].to_numpy()),
               index_maxgap*h)
 
+#%%
 for target in list(data):
     # try:
         areas = []
@@ -395,11 +396,12 @@ def myr2(x,y,data_x, data_y):
   except:
     return 0
 
-
+n = 0
 for target in list(data):
     # try:
+        plt.figure(figsize=(5,5))
         areas = []
-        samples = np.arange(1,50,1)
+        samples = np.arange(1,31,1)
         weightss = ['uniform', 'distance']
         
         for weights in weightss:
@@ -417,14 +419,14 @@ for target in list(data):
                   totals.append(myr2(x,y,dfs[index].to_numpy(), raw))
               
               
-                Area_poly = (np.sum(totals))
+                Area_poly = np.power((np.sum(totals)/len(totals)),0.5)
                 areas.append(Area_poly)
                 
             plt.plot(samples,areas, label=f'RNR, {weights}')
         
         from sklearn.neighbors import KNeighborsRegressor
         
-        ks = np.arange(1,50,1)
+        ks = np.arange(1,31,1)
         for weights in weightss:
             areas = []
             for i in ks:
@@ -441,18 +443,141 @@ for target in list(data):
                   totals.append(myr2(x,y,dfs[index].to_numpy(), raw))
               
               
-                Area_poly = (np.sum(totals))
+                Area_poly = np.power((np.sum(totals)/len(totals)),0.5)
                 areas.append(Area_poly)
                
             plt.plot(ks,areas, label=f'KNN, {weights}')
         
+        plt.xlabel('n \ radius multiplier')
+        plt.ylabel('Error [RMS]')
         plt.legend()
         plt.title(target)
         plt.grid()
+        plt.yscale('log')
+        plt.savefig(f'{n}.pdf')
+        n += 1
         plt.show()
     # except:
     #     print(f'{target} failed for some reason')
 
+#%%
+# no poly version, multi - 
+def myr2multi(x_start, y_start, x_stop, y_stop, data_x, data_y, res):
+  try:
+      loc_results = []
+      x_range = np.linspace(x_start, x_stop, res+1)[:-1]
+      y_range = np.linspace(y_start, y_stop, res+1)[:-1]
+      
+      for i in range(res):
+        x = x_range[i]
+        y = y_range[i]
+        x1 = np.max(data_x[data_x <= x])
+        x2 = np.min(data_x[data_x > x])
+        
+        loc1 = np.where(data_x == x1)
+        loc2 = np.where(data_x == x2)
+        
+        y1 = data_y[loc1][-1]
+        y2 = data_y[loc2][0]
+        
+        
+        
+        m = (y1-y2)/(x1-x2)
+        b = (x1*y2 - x2*y1)/(x1-x2)
+        
+        
+        y_inter = m * x + b
+
+        loc_results.append(np.power(y-y_inter, 2))
+        
+      return loc_results
+  except:
+    return 0
+    print('oops')
+
+n = 0
+res = 10
+for target in list(data):
+    # try:
+        plt.figure(figsize=(5,5))
+        areas = []
+        samples = np.arange(1,31,1)
+        weightss = ['uniform', 'distance']
+        
+        for weights in weightss:
+            areas = []
+            for i in samples:
+                reg = RadiusNeighborsRegressor(radius=index_maxgap*i, weights=weights)
+                raw = dfs[target].interpolate().ffill().bfill().to_numpy()
+                reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+                data_y = reg.predict(data_x.reshape(-1,1))
+                
+                totals = []
+                
+                newdata = np.rot90([data_x,data_y])
+                
+                for i in range(1,len(newdata)):
+                  x_start = newdata[i-1][0]
+                  y_start = newdata[i-1][1]
+                  x_stop = newdata[i][0]
+                  y_stop = newdata[i][1]
+                  result = myr2multi(x_start, y_start,
+                                          x_stop, y_stop,
+                                          dfs[index].to_numpy(), raw,
+                                          res)
+
+                  totals.append(result)
+              
+                totals = np.asarray(totals)
+                
+                Area_poly = np.power((np.sum(totals)/totals.size),0.5)
+
+                areas.append(Area_poly)
+                
+            plt.plot(samples,areas, label=f'RNR, {weights}')
+        
+        from sklearn.neighbors import KNeighborsRegressor
+        
+        ks = np.arange(1,31,1)
+        for weights in weightss:
+            areas = []
+            for i in ks:
+                reg = KNeighborsRegressor(n_neighbors=i, weights=weights)
+                raw = dfs[target].interpolate().ffill().bfill().to_numpy()
+                reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
+                data_y = reg.predict(data_x.reshape(-1,1))
+
+                totals = []
+                
+                newdata = np.rot90([data_x,data_y])
+                
+                for i in range(1,len(newdata)):
+                  x_start = newdata[i-1][0]
+                  y_start = newdata[i-1][1]
+                  x_stop = newdata[i][0]
+                  y_stop = newdata[i][1]
+                  totals.append(myr2multi(x_start, y_start,
+                                          x_stop, y_stop,
+                                          dfs[index].to_numpy(), raw,
+                                          res))
+              
+                totals = np.asarray(totals)
+                Area_poly = np.power((np.sum(totals)/totals.size),0.5)
+                areas.append(Area_poly)
+               
+            plt.plot(ks,areas, label=f'KNN, {weights}')
+        
+        plt.xlabel('n \ radius multiplier')
+        plt.ylabel('Error [RMS]')
+        plt.legend()
+        plt.title(target)
+        plt.grid()
+        plt.yscale('log')
+        plt.savefig(f'multi_{n}.pdf')
+        n += 1
+        plt.show()
+    # except:
+    #     print(f'{target} failed for some reason')
 
 
 #%%
@@ -542,3 +667,102 @@ plt.tight_layout()
 
 
 plt.savefig('Cumulative weights2.pdf')
+
+#%%
+import glob
+filelist = (glob.glob("full_log*.npy"))
+
+data_array = []
+for file in filelist:
+    data = np.load(file, allow_pickle=True)
+    if len(data) > 0:
+        data_array.append(data)
+    
+data = np.vstack(data_array)
+#%%
+    
+
+plt.figure(figsize=(4,2.5))
+
+df = pd.DataFrame(data=data, columns=["method", "n", "param"])
+df['n'] = df['n'].astype(int)
+
+methods = ['KNN uniform', 'KNN distance', 'RNR uniform', 'RNR distance']
+ns = np.arange(1,11,1)
+ms = np.arange(0,4,1)
+summary = []
+for m in ms:
+    for n in ns:
+        dft = df[df['method'] == methods[m]]
+        dft = dft[dft['n'] == n]
+        summary.append([m,n,len(dft)])
+summary = np.asarray(summary)       
+
+methods_plot = ['KNN\nuniform',
+                'KNN\ndistance',
+                'RNR\nuniform',
+                'RNR\ndistance']
+
+scaler = 1.5
+
+plt.scatter(x=summary[:,1], y=summary[:,0], s=summary[:,2]*scaler, c='steelblue')
+plt.xticks(ns)
+plt.yticks(ms, methods_plot)
+
+sizes = np.arange(100,401,100)
+sizes = np.hstack((1,sizes))
+for s in sizes:
+    plt.scatter([],[],s=s*scaler, c='steelblue', label=f'{s}\n ')
+
+plt.legend(title='winner count', bbox_to_anchor=(1.0, 1), loc='upper left')
+plt.xlabel('Neighbor count / Radius multiplier')
+
+
+#%%
+import glob
+filelist = (glob.glob("rimann*.npy"))
+
+data_array = []
+for file in filelist:
+    data = np.load(file, allow_pickle=True)
+    if len(data) > 0:
+        data_array.append(data)
+    
+data = np.vstack(data_array)
+
+    
+
+plt.figure(figsize=(4,2.5))
+
+df = pd.DataFrame(data=data, columns=["method", "n", "param"])
+df['n'] = df['n'].astype(int)
+
+methods = ['KNN uniform', 'KNN distance', 'RNR uniform', 'RNR distance']
+ns = np.arange(1,11,1)
+ms = np.arange(0,4,1)
+summary = []
+for m in ms:
+    for n in ns:
+        dft = df[df['method'] == methods[m]]
+        dft = dft[dft['n'] == n]
+        summary.append([m,n,len(dft)])
+summary = np.asarray(summary)       
+
+methods_plot = ['KNN\nuniform',
+                'KNN\ndistance',
+                'RNR\nuniform',
+                'RNR\ndistance']
+
+scaler = 1.5
+
+plt.scatter(x=summary[:,1], y=summary[:,0], s=summary[:,2]*scaler, c='steelblue')
+plt.xticks(ns)
+plt.yticks(ms, methods_plot)
+
+sizes = np.arange(100,401,100)
+sizes = np.hstack((1,sizes))
+for s in sizes:
+    plt.scatter([],[],s=s*scaler, c='steelblue', label=f'{s}\n ')
+
+plt.legend(title='winner count', bbox_to_anchor=(1.0, 1), loc='upper left')
+plt.xlabel('Neighbor count / Radius multiplier')

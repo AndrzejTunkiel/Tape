@@ -679,7 +679,7 @@ for file in filelist:
         data_array.append(data)
     
 data = np.vstack(data_array)
-#%%
+
     
 
 plt.figure(figsize=(4,2.5))
@@ -720,7 +720,7 @@ plt.xlabel('Neighbor count / Radius multiplier')
 
 #%%
 import glob
-filelist = (glob.glob("rimann*.npy"))
+filelist = (glob.glob("simann*.npy"))
 
 data_array = []
 for file in filelist:
@@ -753,16 +753,19 @@ methods_plot = ['KNN\nuniform',
                 'RNR\nuniform',
                 'RNR\ndistance']
 
-scaler = 1.5
+scaler = 1
 
-plt.scatter(x=summary[:,1], y=summary[:,0], s=summary[:,2]*scaler, c='steelblue')
+plt.scatter(x=summary[:,1], y=summary[:,0], s=summary[:,2]*scaler,
+            c='steelblue', linewidth=0.5, edgecolors='black')
 plt.xticks(ns)
 plt.yticks(ms, methods_plot)
 
-sizes = np.arange(100,401,100)
+sizes = np.arange(100,1001,300)
 sizes = np.hstack((1,sizes))
 for s in sizes:
-    plt.scatter([],[],s=s*scaler, c='steelblue', label=f'{s}\n ')
+    plt.scatter([],[],s=s*scaler, c='steelblue', label=f'{s}\n '
+                ,linewidth=0.5, edgecolors='black')
 
 plt.legend(title='winner count', bbox_to_anchor=(1.0, 1), loc='upper left')
 plt.xlabel('Neighbor count / Radius multiplier')
+plt.savefig('riemann.pdf')

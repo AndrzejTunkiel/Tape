@@ -461,7 +461,7 @@ for target in list(data):
     #     print(f'{target} failed for some reason')
 
 #%%
-# no poly version, multi - 
+# no poly version, Riemann squared
 def myr2multi(x_start, y_start, x_stop, y_stop, data_x, data_y, res):
   try:
       loc_results = []
@@ -497,13 +497,17 @@ def myr2multi(x_start, y_start, x_stop, y_stop, data_x, data_y, res):
 
 n = 0
 res = 10
+
+global_results = []
+
 for target in list(data):
     # try:
+        local_result = [[],[],[],[]]
         plt.figure(figsize=(5,5))
         areas = []
         samples = np.arange(1,31,1)
         weightss = ['uniform', 'distance']
-        
+        plotno = 0
         for weights in weightss:
             areas = []
             for i in samples:
@@ -526,7 +530,7 @@ for target in list(data):
                                           dfs[index].to_numpy(), raw,
                                           res)
 
-                  totals.append(result)
+                  totals.append(result/np.mean(raw)) # added /np.mean(raw)
               
                 totals = np.asarray(totals)
                 
@@ -535,6 +539,8 @@ for target in list(data):
                 areas.append(Area_poly)
                 
             plt.plot(samples,areas, label=f'RNR, {weights}')
+            local_result[plotno] = areas
+            plotno += 1
         
         from sklearn.neighbors import KNeighborsRegressor
         
@@ -561,11 +567,16 @@ for target in list(data):
                                           dfs[index].to_numpy(), raw,
                                           res))
               
-                totals = np.asarray(totals)
+                totals = np.asarray(totals/np.mean(raw))
                 Area_poly = np.power((np.sum(totals)/totals.size),0.5)
                 areas.append(Area_poly)
                
             plt.plot(ks,areas, label=f'KNN, {weights}')
+            local_result[plotno] = areas
+            plotno += 1
+            
+        local_result = local_result/np.min(local_result)
+        global_results.append(local_result)
         
         plt.xlabel('n \ radius multiplier')
         plt.ylabel('Error [RMS]')
@@ -576,9 +587,46 @@ for target in list(data):
         plt.savefig(f'multi_{n}.pdf')
         n += 1
         plt.show()
+        
+        plt.plot(local_result[0])
+        plt.plot(local_result[1])
+        plt.plot(local_result[2])
+        plt.plot(local_result[3])
+        plt.show()
     # except:
     #     print(f'{target} failed for some reason')
 
+np.save('global_results.npy', global_results)
+#%%
+
+global_results = np.load('global_results.npy') 
+plt.figure(figsize=(4,4))
+global_results = np.asarray(global_results)
+
+methods_plot = [
+    'RNR\nuniform',
+    'RNR\ndistance',
+    'KNN\nuniform',
+    'KNN\ndistance'
+    ]
+
+
+colors = ['red', 'green', 'blue', 'black']
+linestyles = ['-','--', '-.', ':']
+for i in range(4):
+    plt.plot(np.nanmean(global_results[:,i,:], axis=0), label=methods_plot[i],
+             c=colors[i], linewidth=1.5, linestyle = linestyles[i])
+
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+plt.yscale('linear')
+plt.yticks(np.arange(1,3,0.1), np.arange(100,300,10))
+plt.grid()
+plt.xlabel('Neighbor count / radius multiplied')
+plt.ylabel('Average RMS error\ncompared to best selection [%]')
+plt.ylim(1,2)
+plt.xticks(np.arange(-1,31,5), np.arange(0,32,5))
+plt.savefig('algocompare.pdf')
 
 #%%
 
@@ -769,3 +817,92 @@ for s in sizes:
 plt.legend(title='winner count', bbox_to_anchor=(1.0, 1), loc='upper left')
 plt.xlabel('Neighbor count / Radius multiplier')
 plt.savefig('riemann.pdf')
+
+
+#%%
+
+hs = [1,2,3,4,5,6,8,10,12,15,20,30]
+
+for h in hs:
+    
+    res = np.load(f'resh{h}.npy',  allow_pickle=True)
+    
+    data = np.vstack(res)
+
+    
+
+    plt.figure(figsize=(6,2.5))
+    
+    df = pd.DataFrame(data=data, columns=["method", "n", "param"])
+    df['n'] = df['n'].astype(int)
+    
+    methods = ['KNN distance', 'KNN uniform', 'RNR distance', 'RNR uniform']
+    ns = np.arange(1,31,1)
+    ms = np.arange(0,4,1)
+    summary = []
+    for m in ms:
+        for n in ns:
+            dft = df[df['method'] == methods[m]]
+            dft = dft[dft['n'] == n]
+            summary.append([m,n,len(dft)])
+    summary = np.asarray(summary)       
+    
+    
+    xsum = []
+    
+    for i in range(4):
+        xsum.append(np.sum(summary[summary[:,0]==i][:,2]))
+    
+    
+    methods_plot = [f'KNN\ndistance ({xsum[0]})',
+                    f'KNN\nuniform ({xsum[1]})',
+                    f'RNR\ndistance ({xsum[2]})',
+                    f'RNR\nuniform ({xsum[3]})']
+    
+    scaler = 4
+    
+    plt.scatter(x=summary[:,1], y=summary[:,0], s=summary[:,2]*scaler,
+                c='steelblue', linewidth=0.5, edgecolors='black')
+    plt.xticks(ns)
+    plt.yticks(ms, methods_plot)
+    plt.ylim(-0.5,3.5)
+    sizes = np.arange(10,51,10)
+    sizes = np.hstack((1,sizes))
+    for s in sizes:
+        plt.scatter([],[],s=s*scaler, c='steelblue', label=f'{s}'
+                    ,linewidth=0.5, edgecolors='black')
+    
+    plt.legend(title='winner count', bbox_to_anchor=(1.0, 1), loc='upper left')
+    plt.xlabel('Neighbor count / Radius multiplier')
+    #plt.title(f'h-step {h}')
+    plt.xticks(ns[::1],ns[::1],rotation=90)
+    plt.xlim(0,20)
+    plt.grid()
+    plt.savefig(f'h-step {h}.pdf')
+    plt.show()
+    
+#%%
+
+res = np.load(f'resh{5}.npy',  allow_pickle=True)
+data = np.vstack(res)
+
+
+
+plt.figure(figsize=(6,2.5))
+
+df = pd.DataFrame(data=data, columns=["method", "n", "param"])
+df['n'] = df['n'].astype(int)
+
+methods = ['KNN distance', 'KNN uniform', 'RNR distance', 'RNR uniform']
+ns = np.arange(1,31,1)
+ms = np.arange(0,4,1)
+summary = []
+for m in ms:
+    for n in ns:
+        dft = df[df['method'] == methods[m]]
+        dft = dft[dft['n'] == n]
+        summary.append([m,n,len(dft)])
+summary = np.asarray(summary)       
+    
+a = summary
+print(a[a[:, 2].argsort()])

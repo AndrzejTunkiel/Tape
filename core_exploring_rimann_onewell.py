@@ -189,6 +189,12 @@ def minfinder(h):
 
     return full_log
 #%%
+global_results_ave = np.nanmean(global_results, axis=0)
+
+plt.plot(np.rot90(global_results_ave,3))
+plt.ylim(1,2)
+plt.show()
+#%%
 h=5
 
 hs = [1,2,3,4,5,6,8,10,12,15,20,30]

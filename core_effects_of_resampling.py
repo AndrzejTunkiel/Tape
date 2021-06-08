@@ -530,7 +530,7 @@ for target in list(data):
                                           dfs[index].to_numpy(), raw,
                                           res)
 
-                  totals.append(result/np.mean(raw)) # added /np.mean(raw)
+                  totals.append(result) # added /np.mean(raw)
               
                 totals = np.asarray(totals)
                 
@@ -567,7 +567,7 @@ for target in list(data):
                                           dfs[index].to_numpy(), raw,
                                           res))
               
-                totals = np.asarray(totals/np.mean(raw))
+                totals = np.asarray(totals)
                 Area_poly = np.power((np.sum(totals)/totals.size),0.5)
                 areas.append(Area_poly)
                

@@ -14,6 +14,43 @@ from sklearn.neighbors import RadiusNeighborsRegressor
 from sklearn.neighbors import KNeighborsRegressor
 plt.style.use(['science','no-latex'])
 #%%
+
+def myr2multi(x_start, y_start, x_stop, y_stop, data_x, data_y, res):
+  try:
+      loc_results = []
+      x_range = np.linspace(x_start, x_stop, res+1)[:-1]
+      y_range = np.linspace(y_start, y_stop, res+1)[:-1]
+      
+      for i in range(res):
+        x = x_range[i]
+        y = y_range[i]
+        x1 = np.max(data_x[data_x <= x])
+        x2 = np.min(data_x[data_x > x])
+        
+        loc1 = np.where(data_x == x1)
+        loc2 = np.where(data_x == x2)
+        
+        y1 = data_y[loc1][-1]
+        y2 = data_y[loc2][0]
+        
+        
+        
+        m = (y1-y2)/(x1-x2)
+        b = (x1*y2 - x2*y1)/(x1-x2)
+        
+        
+        y_inter = m * x + b
+
+        loc_results.append(np.power(y-y_inter, 2))
+        
+      return loc_results
+  except:
+    return [0]*res
+    print('oops')
+
+
+res = 10
+#%%
 extensions = np.linspace(1,10,100)
 
 start = 0
@@ -22,7 +59,7 @@ samples = 100
 
 sto=1
 
-carlo = 10*sto
+carlo = 100*sto
 
 
 fig, axs = plt.subplots(2,2, figsize = (5,6), sharey=True)
@@ -30,9 +67,11 @@ global_results = []
 global_p95 = []
 global_p5 = []
 
+areas_global = []
 for i in extensions:
     print(".", end="")
     local_results = []
+    areas_local = []
     for j in range(carlo):
         start = 0
         stop = 10
@@ -60,11 +99,34 @@ for i in extensions:
         result = np.mean(np.abs(diff))
         
         local_results.append(result)
-
         
+        totals = []
+        newdata = np.rot90([x_uniform,y_reg])
+        for j in range(1,len(newdata)):
+                  x_start = newdata[j-1][0]
+                  y_start = newdata[j-1][1]
+                  x_stop = newdata[j][0]
+                  y_stop = newdata[j][1]
+                  r2result = myr2multi(x_start, y_start,
+                                          x_stop, y_stop,
+                                          x, y,
+                                          res)
+
+                  totals.append(r2result/np.mean(y)) # added /np.mean(raw)
+              
+        totals = np.asarray(totals)
+                
+        Area_poly = np.power((np.sum(totals)/totals.size),0.5)
+
+        areas_local.append(Area_poly)
+
+    areas_global.append(np.nanmean(areas_local))    
+    
     global_results.append(np.mean(local_results))
     global_p5.append(np.percentile(local_results,5))
     global_p95.append(np.percentile(local_results,95))
+
+g1 = global_results.copy()
 
 axs[0,0].scatter(extensions, global_results, marker = '.', label='RNR',
                c='black', s=10,)
@@ -94,9 +156,12 @@ global_results = []
 global_p95 = []
 global_p5 = []
 
+
+
 for i in extensions:
     print("$", end="")
     local_results = []
+    areas_local = []
     for j in range(carlo):
         start = 0
         stop = 10
@@ -124,12 +189,34 @@ for i in extensions:
         result = np.mean(np.abs(diff))
         
         local_results.append(result)
+        totals = []
+        newdata = np.rot90([x_uniform,y_reg])
+        
+        for j in range(1,len(newdata)):
+                  x_start = newdata[j-1][0]
+                  y_start = newdata[j-1][1]
+                  x_stop = newdata[j][0]
+                  y_stop = newdata[j][1]
+                  r2result = myr2multi(x_start, y_start,
+                                          x_stop, y_stop,
+                                          x, y,
+                                          res)
 
+                  totals.append(r2result/np.mean(y)) # added /np.mean(raw)
+              
+        totals = np.asarray(totals)
+                
+        Area_poly = np.power((np.sum(totals)/totals.size),0.5)
+
+        areas_local.append(Area_poly)
+
+    areas_global.append(np.nanmean(areas_local))    
         
     global_results.append(np.mean(local_results))
     global_p5.append(np.percentile(local_results,5))
     global_p95.append(np.percentile(local_results,95))
 
+g2 = global_results.copy()
 axs[0,1].scatter(extensions, global_results, marker = '.', label='RNR',
                c='black', s=10,)
 
@@ -158,6 +245,7 @@ global_results = []
 for i in extensions:
     print(",", end="")
     local_results = []
+    areas_local = []
     for j in range(carlo):
         x = np.random.uniform(start, stop, samples)
         x = np.sort(x)
@@ -181,13 +269,33 @@ for i in extensions:
         result = np.mean(np.abs(diff))
         
         local_results.append(result)
+        totals = []
+        newdata = np.rot90([x_uniform,y_reg])
+        for j in range(1,len(newdata)):
+                  x_start = newdata[j-1][0]
+                  y_start = newdata[j-1][1]
+                  x_stop = newdata[j][0]
+                  y_stop = newdata[j][1]
+                  r2result = myr2multi(x_start, y_start,
+                                          x_stop, y_stop,
+                                          x, y,
+                                          res)
 
+                  totals.append(r2result/np.mean(y)) # added /np.mean(raw)
+              
+        totals = np.asarray(totals)
+                
+        Area_poly = np.power((np.sum(totals)/totals.size),0.5)
+
+        areas_local.append(Area_poly)
+
+    areas_global.append(np.nanmean(areas_local))    
         
     global_results.append(np.mean(local_results))
     global_p5.append(np.percentile(local_results,5))
     global_p95.append(np.percentile(local_results,95))
     
-    
+g3 = global_results.copy()   
 axs[1,0].scatter(extensions, global_results, marker = '.', #label='mean',
                c='black', s=10)
 
@@ -218,6 +326,7 @@ global_results = []
 for i in extensions:
     print("^", end="")
     local_results = []
+    areas_local = []
     for j in range(carlo):
         x = np.random.uniform(start, stop, samples)
         x = np.sort(x)
@@ -241,13 +350,34 @@ for i in extensions:
         result = np.mean(np.abs(diff))
         
         local_results.append(result)
+        
+        totals = []
+        newdata = np.rot90([x_uniform,y_reg])
+        for j in range(1,len(newdata)):
+                  x_start = newdata[j-1][0]
+                  y_start = newdata[j-1][1]
+                  x_stop = newdata[j][0]
+                  y_stop = newdata[j][1]
+                  r2result = myr2multi(x_start, y_start,
+                                          x_stop, y_stop,
+                                          x, y,
+                                          res)
 
+                  totals.append(r2result/np.mean(y)) # added /np.mean(raw)
+              
+        totals = np.asarray(totals)
+                
+        Area_poly = np.power((np.sum(totals)/totals.size),0.5)
+
+        areas_local.append(Area_poly)
+
+    areas_global.append(np.nanmean(areas_local))    
         
     global_results.append(np.mean(local_results))
     global_p5.append(np.percentile(local_results,5))
     global_p95.append(np.percentile(local_results,95))
     
-    
+g4 = global_results.copy()   
 axs[1,1].scatter(extensions, global_results, marker = '.', label='mean',
                c='black', s=10)
 
@@ -339,7 +469,51 @@ axs[1,1].legend()
 plt.tight_layout()
 plt.savefig('resampling.pdf')
 plt.show()
+#%%
+fig, axs = plt.subplots(2,2, figsize = (5,6), sharey=True)
+axs[0,0].scatter(np.linspace(0,10,100),areas_global[:100], s=5, c='black')
+axs[0,1].scatter(np.linspace(0,10,100),areas_global[100:200], s=5, c='black')
+axs[1,0].scatter(np.linspace(1,50,50),areas_global[200:250], s=5, c='black', label='RMRS')
+axs[1,1].scatter(np.linspace(1,50,50),areas_global[250:], s=5, c='black')
 
+
+axs[0,0].set_xlabel('Radius multiplier')
+axs[0,0].set_ylabel('Root Mean Riemann Squared')
+axs[0,0].grid()
+axs[0,0].set_axisbelow(True)
+axs[0,0].title.set_text('RadiusNeighbors\nRegressor,\nweights=distance')
+
+axs[0,0].set_axisbelow(True)
+
+
+axs[0,1].grid()
+axs[0,1].set_xlabel('Radius multiplier')
+axs[0,1].set_axisbelow(True)
+axs[0,1].title.set_text('RadiusNeighbors\nRegressor,\nweights=uniform')
+
+axs[1,0].set_ylabel('Root Mean Riemann Squared')
+axs[1,0].set_axisbelow(True)
+axs[1,0].title.set_text('KNeighbors\nRegressor,\nweights=distance')
+axs[1,0].grid()
+axs[1,0].set_xlabel('Neighbour count')
+
+
+
+
+axs[1,1].grid()
+axs[1,1].set_axisbelow(True)
+axs[1,1].title.set_text('KNeighbors\nRegressor,\nweights=uniform')
+axs[1,1].legend()
+axs[1,1].set_xlabel('Neighbour count')
+
+plt.tight_layout()
+plt.savefig('resampling RMRS.pdf')
+#%%
+fig, axs = plt.subplots(2,2, figsize = (5,6), sharey=True)
+axs[0,0].scatter(g1,areas_global[:100])
+axs[0,1].scatter(g2,areas_global[100:200])
+axs[1,0].scatter(g3,areas_global[200:250])
+axs[1,1].scatter(g4,areas_global[250:])
 #%%
 np.random.seed(42)
 start = 0

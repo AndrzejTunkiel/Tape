@@ -137,7 +137,7 @@ axs[0,0].scatter(extensions, global_p5, marker = '_', label='RNR',
 axs[0,0].scatter(extensions, global_p95, marker = '_', label='RNR',
                c='gray', s=10)
 axs[0,0].set_xlabel('Radius multiplier')
-axs[0,0].set_ylabel('Mean Absolute Error')
+axs[0,0].set_ylabel('RMS')
 axs[0,0].grid()
 
 axs[0,0].set_axisbelow(True)
@@ -307,7 +307,7 @@ axs[1,0].scatter(extensions, global_p95, marker = '_',
 axs[1,0].set_xlabel('Neighbour count')
 
 axs[1,0].grid()
-axs[1,0].set_ylabel('Mean Absolute Error')
+axs[1,0].set_ylabel('RMS')
 axs[1,0].set_axisbelow(True)
 axs[1,0].title.set_text('KNeighbors\nRegressor,\nweights=distance')
 axs[1,0].axhline(y=0.199, xmin=0, xmax=1, color='black', linewidth=1,

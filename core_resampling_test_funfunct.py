@@ -170,10 +170,10 @@ axs[0,0].scatter(extensions, global_results, marker = '.',
                c='black', s=10,)
 
 axs[0,0].scatter(extensions, global_p5, marker = '_', 
-               c='gray', s=10,)
+               c='red', s=10,)
 
 axs[0,0].scatter(extensions, global_p95, marker = '_',
-               c='gray', s=10)
+               c='red', s=10)
 axs[0,0].set_xlabel('Radius multiplier')
 axs[0,0].set_ylabel('Root Mean Square')
 axs[0,0].grid()
@@ -260,10 +260,10 @@ axs[0,1].scatter(extensions, global_results, marker = '.', label='RNR',
                c='black', s=10,)
 
 axs[0,1].scatter(extensions, global_p5, marker = '_', label='RNR',
-               c='gray', s=10,)
+               c='red', s=10,)
 
 axs[0,1].scatter(extensions, global_p95, marker = '_', label='RNR',
-               c='gray', s=10)
+               c='red', s=10)
 axs[0,1].set_xlabel('Radius multiplier')
 
 axs[0,1].grid()
@@ -340,10 +340,10 @@ axs[1,0].scatter(extensions, global_results, marker = '.', #label='mean',
                c='black', s=10)
 
 axs[1,0].scatter(extensions, global_p5, marker = '_', #label='5th/95th percentile',
-               c='gray', s=10)
+               c='red', s=10)
 
 axs[1,0].scatter(extensions, global_p95, marker = '_',
-               c='gray', s=10)
+               c='red', s=10)
 axs[1,0].set_xlabel('Neighbour count')
 
 axs[1,0].grid()
@@ -422,10 +422,10 @@ axs[1,1].scatter(extensions, global_results, marker = '.', label='mean',
                c='black', s=10)
 
 axs[1,1].scatter(extensions, global_p5, marker = '_', label='5th/95th percentile',
-               c='gray', s=10)
+               c='red', s=10)
 
 axs[1,1].scatter(extensions, global_p95, marker = '_',
-               c='gray', s=10)
+               c='red', s=10)
 axs[1,1].set_xlabel('Neighbour count')
 
 axs[1,1].grid()
@@ -464,16 +464,16 @@ axs[0,1].scatter(np.linspace(0,10,100),areas_global[100:200], s=5, c='black')
 axs[1,0].scatter(np.linspace(1,50,50),areas_global[200:250], s=5, c='black')
 axs[1,1].scatter(np.linspace(1,50,50),areas_global[250:], s=5, c='black')
 
-axs[0,0].scatter(np.linspace(0,10,100),areas_5[:100], s=2, c='grey',
-                  label='5/95 percentile')
-axs[0,1].scatter(np.linspace(0,10,100),areas_5[100:200], s=2, c='grey')
-axs[1,0].scatter(np.linspace(1,50,50),areas_5[200:250], s=2, c='grey')
-axs[1,1].scatter(np.linspace(1,50,50),areas_5[250:], s=2, c='grey')
+axs[0,0].scatter(np.linspace(0,10,100),areas_5[:100], s=10, c='red',
+                  label='5/95 percentile', marker = '_')
+axs[0,1].scatter(np.linspace(0,10,100),areas_5[100:200], s=10, c='red', marker = '_')
+axs[1,0].scatter(np.linspace(1,50,50),areas_5[200:250], s=10, c='red', marker = '_')
+axs[1,1].scatter(np.linspace(1,50,50),areas_5[250:], s=10, c='red', marker = '_')
 
-axs[0,0].scatter(np.linspace(0,10,100),areas_95[:100], s=2, c='grey')
-axs[0,1].scatter(np.linspace(0,10,100),areas_95[100:200], s=2, c='grey')
-axs[1,0].scatter(np.linspace(1,50,50),areas_95[200:250], s=2, c='grey')
-axs[1,1].scatter(np.linspace(1,50,50),areas_95[250:], s=2, c='grey')
+axs[0,0].scatter(np.linspace(0,10,100),areas_95[:100], s=10, c='red', marker = '_')
+axs[0,1].scatter(np.linspace(0,10,100),areas_95[100:200], s=10, c='red', marker = '_')
+axs[1,0].scatter(np.linspace(1,50,50),areas_95[200:250], s=10, c='red', marker = '_')
+axs[1,1].scatter(np.linspace(1,50,50),areas_95[250:], s=10, c='red', marker = '_')
 
 
 axs[0,0].set_xlabel('Radius multiplier')

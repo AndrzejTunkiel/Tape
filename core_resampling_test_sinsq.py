@@ -153,10 +153,10 @@ axs[0,0].scatter(extensions, global_results, marker = '.', label='RNR',
                c='black', s=10,)
 
 axs[0,0].scatter(extensions, global_p5, marker = '_', label='RNR',
-               c='gray', s=10,)
+               c='red', s=10,)
 
 axs[0,0].scatter(extensions, global_p95, marker = '_', label='RNR',
-               c='gray', s=10)
+               c='red', s=10)
 axs[0,0].set_xlabel('Radius multiplier')
 axs[0,0].set_ylabel('Mean Absolute Error')
 axs[0,0].grid()
@@ -243,10 +243,10 @@ axs[0,1].scatter(extensions, global_results, marker = '.', label='RNR',
                c='black', s=10,)
 
 axs[0,1].scatter(extensions, global_p5, marker = '_', label='RNR',
-               c='gray', s=10,)
+               c='red', s=10,)
 
 axs[0,1].scatter(extensions, global_p95, marker = '_', label='RNR',
-               c='gray', s=10)
+               c='red', s=10)
 axs[0,1].set_xlabel('Radius multiplier')
 
 axs[0,1].grid()
@@ -322,10 +322,10 @@ axs[1,0].scatter(extensions, global_results, marker = '.', #label='mean',
                c='black', s=10)
 
 axs[1,0].scatter(extensions, global_p5, marker = '_', #label='5th/95th percentile',
-               c='gray', s=10)
+               c='red', s=10)
 
 axs[1,0].scatter(extensions, global_p95, marker = '_',
-               c='gray', s=10)
+               c='red', s=10)
 axs[1,0].set_xlabel('Neighbour count')
 
 axs[1,0].grid()
@@ -404,10 +404,10 @@ axs[1,1].scatter(extensions, global_results, marker = '.', label='mean',
                c='black', s=10)
 
 axs[1,1].scatter(extensions, global_p5, marker = '_', label='5th/95th percentile',
-               c='gray', s=10)
+               c='red', s=10)
 
 axs[1,1].scatter(extensions, global_p95, marker = '_',
-               c='gray', s=10)
+               c='red', s=10)
 axs[1,1].set_xlabel('Neighbour count')
 
 axs[1,1].grid()
@@ -439,7 +439,7 @@ for row in backup:
     areas_global.append(np.nanmean(row))
     areas_5.append(np.nanpercentile(row,5))
     areas_95.append(np.nanpercentile(row,95))
-
+ss = 10
 fig, axs = plt.subplots(2,2, figsize = (5,6), sharey=True)
 axs[0,0].scatter(np.linspace(0,10,100),areas_global[:100], s=5, c='black',
                  label='mean')
@@ -447,16 +447,16 @@ axs[0,1].scatter(np.linspace(0,10,100),areas_global[100:200], s=5, c='black')
 axs[1,0].scatter(np.linspace(1,50,50),areas_global[200:250], s=5, c='black')
 axs[1,1].scatter(np.linspace(1,50,50),areas_global[250:], s=5, c='black')
 
-axs[0,0].scatter(np.linspace(0,10,100),areas_5[:100], s=2, c='grey',
-                  label='5/95 percentile')
-axs[0,1].scatter(np.linspace(0,10,100),areas_5[100:200], s=2, c='grey')
-axs[1,0].scatter(np.linspace(1,50,50),areas_5[200:250], s=2, c='grey')
-axs[1,1].scatter(np.linspace(1,50,50),areas_5[250:], s=2, c='grey')
+axs[0,0].scatter(np.linspace(0,10,100),areas_5[:100], s=ss, c='red',
+                  label='5/95 percentile', marker = '_')
+axs[0,1].scatter(np.linspace(0,10,100),areas_5[100:200], s=ss, c='red', marker = '_')
+axs[1,0].scatter(np.linspace(1,50,50),areas_5[200:250], s=ss, c='red', marker = '_')
+axs[1,1].scatter(np.linspace(1,50,50),areas_5[250:], s=ss, c='red', marker = '_')
 
-axs[0,0].scatter(np.linspace(0,10,100),areas_95[:100], s=2, c='grey')
-axs[0,1].scatter(np.linspace(0,10,100),areas_95[100:200], s=2, c='grey')
-axs[1,0].scatter(np.linspace(1,50,50),areas_95[200:250], s=2, c='grey')
-axs[1,1].scatter(np.linspace(1,50,50),areas_95[250:], s=2, c='grey')
+axs[0,0].scatter(np.linspace(0,10,100),areas_95[:100], s=ss, c='red', marker = '_')
+axs[0,1].scatter(np.linspace(0,10,100),areas_95[100:200], s=ss, c='red', marker = '_')
+axs[1,0].scatter(np.linspace(1,50,50),areas_95[200:250], s=ss, c='red', marker = '_')
+axs[1,1].scatter(np.linspace(1,50,50),areas_95[250:], s=ss, c='red', marker = '_')
 
 
 axs[0,0].set_xlabel('Radius multiplier')

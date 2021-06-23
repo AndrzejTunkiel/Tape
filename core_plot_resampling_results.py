@@ -43,7 +43,7 @@ for r in resampling:
         
         i += 1
         
-axs[0].set_ylabel('Mean Absolute Error\n[degrees]')
+axs[0].set_ylabel('Mean Absolute Error\n[deg]')
 
 
 axs[0].set_title(f'Fixed Radius\nuniform weight')
@@ -52,8 +52,8 @@ axs[2].set_title(f'K-Nearest Neighbors\nuniform weight')
 axs[3].set_title(f'K-Nearest Neighbors\ndistance weight')
 
 
-axs[0].set_xlabel(f'radius multiplier n\n (r = n * max_step)')
-axs[1].set_xlabel(f'radius multiplier n\n (r = n * max_step)')
+axs[0].set_xlabel(f'radius multiplier\n (r = multiplier * max_step)')
+axs[1].set_xlabel(f'radius multiplier\n (r = multiplier * max_step)')
 axs[2].set_xlabel(f'K, neighbor count')
 axs[3].set_xlabel(f'K, neighbor count')
 
@@ -103,8 +103,8 @@ axs[2].set_title(f'K-Nearest Neighbors\nuniform weight')
 axs[3].set_title(f'K-Nearest Neighbors\ndistance weight')
 
 
-axs[0].set_xlabel(f'radius multiplier n\n (r = n * max_step)')
-axs[1].set_xlabel(f'radius multiplier n\n (r = n * max_step)')
+axs[0].set_xlabel(f'radius multiplier\n (r = multiplier * max_step)')
+axs[1].set_xlabel(f'radius multiplier\n (r = multiplier * max_step)')
 axs[2].set_xlabel(f'K, neighbor count')
 axs[3].set_xlabel(f'K, neighbor count')
 
@@ -369,7 +369,7 @@ order = [1,0,2,3,6,5,4,7]
 plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], 
            bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
 plt.xlabel('Parameter quantity')
-plt.ylabel('Mean Absolute Error [degrees]')
+plt.ylabel('Mean Absolute Error [deg]')
 plt.tight_layout()
 plt.savefig('selstrat_lcs.pdf')
 plt.show()
@@ -405,7 +405,7 @@ for strategy in strategies:
 sns.swarmplot(data = df, x='qty', y='MAE', hue = 'strategy', s=6, dodge=False)
 plt.grid()
 plt.xlabel('Parameter quantity')
-plt.ylabel('Mean Absolute Error [degrees]')
+plt.ylabel('Mean Absolute Error [deg]')
 handles, labels = plt.gca().get_legend_handles_labels()
 
 order = [1,0,2,5,4,3]

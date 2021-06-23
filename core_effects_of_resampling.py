@@ -157,21 +157,21 @@ raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[0].plot(x,y, c='blue', linewidth=1, label='n = 1', linestyle="-")
+axs[0].plot(x,y, c='blue', linewidth=1, label='K = 1', linestyle="-")
 
 reg = KNeighborsRegressor(n_neighbors=20, weights='uniform')
 raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[0].plot(x,y, c='black', linewidth=1, label='n = 20', linestyle="-")
+axs[0].plot(x,y, c='black', linewidth=1, label='K = 20', linestyle="-")
 
 reg = KNeighborsRegressor(n_neighbors=100, weights='uniform')
 raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[0].plot(x,y, c='black', linewidth=1, label='n = 100', linestyle="--")
+axs[0].plot(x,y, c='black', linewidth=1, label='K = 100', linestyle="--")
 
 
 raw_x = dfs[index].to_numpy()
@@ -191,21 +191,21 @@ raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[1].plot(x,y, c='blue', linewidth=1, label='n = 1', linestyle="-")
+axs[1].plot(x,y, c='blue', linewidth=1, label='K = 1', linestyle="-")
 
 reg = KNeighborsRegressor(n_neighbors=20, weights='distance')
 raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[1].plot(x,y, c='black', linewidth=1, label='n = 20', linestyle="-")
+axs[1].plot(x,y, c='black', linewidth=1, label='K = 20', linestyle="-")
 
 reg = KNeighborsRegressor(n_neighbors=100, weights='distance')
 raw = dfs['Rate of Penetration m/h'].interpolate().ffill().bfill().to_numpy()
 reg.fit(dfs[index].to_numpy().reshape(-1,1),raw)
 y = reg.predict(x.reshape(-1,1))
 
-axs[1].plot(x,y, c='black', linewidth=1, label='n = 100', linestyle="--")
+axs[1].plot(x,y, c='black', linewidth=1, label='K = 100', linestyle="--")
 
 
 raw_x = dfs[index].to_numpy()
@@ -448,7 +448,7 @@ for target in list(data):
                
             plt.plot(ks,areas, label=f'KNN, {weights}')
         
-        plt.xlabel('n \ radius multiplier')
+        plt.xlabel('K \ radius multiplier')
         plt.ylabel('Error [RMS]')
         plt.legend()
         plt.title(target)
@@ -499,14 +499,19 @@ n = 0
 res = 10
 
 global_results = []
+colors = ['red', 'green', 'blue', 'black']
+linestyles = ['-','--', '-.', ':']
+
 
 for target in list(data):
     # try:
+        c = 0
         local_result = [[],[],[],[]]
-        plt.figure(figsize=(5,5))
+        plt.figure(figsize=(4,4))
         areas = []
         samples = np.arange(1,31,1)
         weightss = ['uniform', 'distance']
+
         plotno = 0
         for weights in weightss:
             areas = []
@@ -538,7 +543,9 @@ for target in list(data):
 
                 areas.append(Area_poly)
                 
-            plt.plot(samples,areas, label=f'RNR, {weights}')
+            plt.plot(samples,areas, label=f'RNR\n{weights}',
+                     c = colors[c], linestyle = linestyles[c],linewidth=1.5 )
+            c += 1
             local_result[plotno] = areas
             plotno += 1
         
@@ -571,16 +578,18 @@ for target in list(data):
                 Area_poly = np.power((np.sum(totals)/totals.size),0.5)
                 areas.append(Area_poly)
                
-            plt.plot(ks,areas, label=f'KNN, {weights}')
+            plt.plot(ks,areas, label=f'KNN\n{weights}',
+                     c = colors[c], linestyle = linestyles[c],linewidth=1.5 )
+            c += 1
             local_result[plotno] = areas
             plotno += 1
             
         local_result = local_result/np.min(local_result)
         global_results.append(local_result)
         
-        plt.xlabel('n \ radius multiplier')
-        plt.ylabel('Error [RMS]')
-        plt.legend()
+        plt.xlabel('neigbor count / radius multiplier')
+        plt.ylabel('error [RMS]')
+        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.title(target)
         plt.grid()
         plt.yscale('log')
@@ -619,12 +628,13 @@ for i in range(4):
 
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 
-plt.yscale('linear')
-plt.yticks(np.arange(1,3,0.1), np.arange(100,300,10))
+plt.yscale('log')
+ymax = 3.1
+plt.yticks(np.arange(1,ymax,0.2), np.arange(100,ymax*100,20).astype(int))
 plt.grid()
-plt.xlabel('Neighbor count / radius multiplied')
-plt.ylabel('Average RMS error\ncompared to best selection [%]')
-plt.ylim(1,2)
+plt.xlabel('neighbor count / radius multiplied')
+plt.ylabel('average RMS error\ncompared to best selection [%]')
+plt.ylim(1,3)
 plt.xticks(np.arange(-1,31,5), np.arange(0,32,5))
 plt.savefig('algocompare.pdf')
 

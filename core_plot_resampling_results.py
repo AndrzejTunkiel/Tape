@@ -425,3 +425,189 @@ plt.xlabel('Resampling method with lowest area between lines')
 plt.xticks([0,1,2,3], ['KNN\nuniform', 'KNN\ndistance', 'RNR\nuniform', 'RNR\ndistance'])
 plt.ylabel('Attribute count')
 plt.savefig('betweenlines.pdf')
+
+#%%
+
+
+
+fig, axs = plt.subplots(2, 1, figsize=(5,5),
+                        gridspec_kw={'height_ratios': [4, 2]})
+
+df = pd.read_csv('f9ad.csv')
+
+df = df.iloc[2000:10000]
+
+cols = ['Measured Depth m', 'TOFB s', 'AVG_CONF unitless', 'MIN_CONF unitless', 'Average Rotary Speed rpm', 'STUCK_RT unitless', 'Corrected Surface Weight on Bit kkgf', 'Corrected Total Hookload kkgf', 'MWD Turbine RPM rpm', 'MWD Raw Gamma Ray 1/s', 'MWD Continuous Inclination dega', 'Pump 2 Stroke Rate 1/min', 'Rate of Penetration m/h', 'Bit Drill Time h', 'Corrected Hookload kkgf', 'MWD GR Bit Confidence Flag %', 'Pump Time h', 'PowerUP Shock Rate 1/s', 'Total SPM 1/min', 'Average Hookload kkgf', 'Total Hookload kkgf', 'Extrapolated Hole TVD m', 'MWD Gamma Ray (API BH corrected) gAPI', 'EDRT unitless', 'Pump 1 Stroke Rate 1/min', 'Total Bit Revolutions unitless', 'Mud Density In g/cm3.1', 'Weight on Bit kkgf', 'Hole Depth (TVD) m', 'MWD Shock Risk unitless', 'Bit run number unitless', 'Inverse ROP s/m', 'Pump 4 Stroke Rate 1/min', 'Rig Mode unitless', 'MWD Shock Peak m/s2', 'SPN Sp_RigMode 2hz unitless', 'Average Standpipe Pressure kPa', 'Rate of Penetration (5ft avg) m/h', 'AJAM_MWD unitless', '1/2ft ROP m/h', 'Hole depth (MD) m', 'Mud Flow In L/min', 'BHFG unitless', 'MWD DNI Temperature degC', 'Average Surface Torque kN.m', 'Total Downhole RPM rpm', 'SHK3TM_RT min', 'Pump 3 Stroke Rate 1/min', 'Inverse ROP (5ft avg) s/m', 'S1AC kPa', 'S2AC kPa', 'IMWT g/cm3', 'OSTM s']
+
+df = df[cols]
+smartfills = np.linspace(0,1.0000001,11)
+counts = []
+percentages = []
+
+for smartfill in smartfills:
+    fill_method = []
+    
+    for attribute in list(df):
+                
+        try:
+            dropna_diff = np.diff(df[attribute].dropna())
+        
+            try:
+                zeros_p = np.count_nonzero(dropna_diff == 0) / len(dropna_diff)
+                
+                if zeros_p >= smartfill: # Threshold to check?
+                    fill_method.append(1)
+                else:
+                    fill_method.append(0)
+            except:
+                pass
+                #print(f'{attribute} failed 1')
+        except:
+            pass
+            #print(f'{attribute} failed 2')
+            
+    #print(smartfill)        
+    #print(f'Average {np.mean(fill_method)}')
+    #print(f'Count {np.sum(fill_method)}')
+    counts.append(np.sum(fill_method))
+    percentages.append(np.mean(fill_method))
+
+percentages = np.asarray(percentages)
+percentages = percentages*100
+
+#plt.figure(figsize=(4,3))
+import seaborn as sns
+df = pd.read_csv('filling_study.csv')
+
+
+sns.boxplot(x=df['smartfill'], y=df['MAE'],color='gray' , ax=axs[0])
+labels = np.round(np.linspace(0,100,11),0).astype(int)
+axs[0].set_xlabel('')
+#labels[0] = 'FF only'
+#labels[-1]= 'LI only'
+axs[0].set_xticks(np.linspace(0,10,11))
+axs[0].set_xticklabels([]*11)
+axs[1].set_xticks(np.linspace(0,10,11))
+axs[1].set_xticklabels(labels, rotation=90)
+axs[1].set_xlabel('''Imputation algorithm selection threshold [%]''')
+#plt.xticks(np.linspace(0,11,11), np.linspace(0,1,11))
+
+axs[0].set_ylabel('Mean Absolute Error [deg]')
+plt.tight_layout()
+
+axs[0].grid()
+
+axs[0].set_xlim(-0.5,10.5)
+axs[1].set_xlim(-0.5,10.5)
+axs[1].bar(x = np.linspace(0,10,11),height=[53]*11, linewidth=1,
+           color='blue', linestyle = '-', label='linear interpolation',
+          edgecolor='black')
+
+axs[1].bar(x = np.linspace(0,10,11),height=counts, color='red',
+           linestyle = '-', label='forward filling',
+         linewidth=1, edgecolor='black')
+axs[1].set_ylabel('Quantity of attributes \n forward-filled')
+axs[1].tick_params(axis='y')
+axs[1].grid()
+axs[1].set_yticks([0,10,20,30,40,50])
+plt.legend(bbox_to_anchor=(1.05, 0.7), loc='upper left')
+plt.subplots_adjust(wspace=0, hspace=0.05)
+plt.savefig('smartfill_study3.pdf')
+plt.show()
+A = df[np.round(df['smartfill'],1) == 1]['MAE'].to_list()
+B = df[np.round(df['smartfill'],1) == 0.2]['MAE'].to_list()
+from scipy import stats
+t_check=stats.ttest_ind(A,B)
+print(t_check[1])
+#%%
+
+
+fig, axs = plt.subplots(2, 1, figsize=(5,5),
+                        gridspec_kw={'height_ratios': [4, 2]})
+
+df = pd.read_csv('f9ad.csv')
+
+df = df.iloc[2000:10000]
+
+cols = ['Measured Depth m', 'TOFB s', 'AVG_CONF unitless', 'MIN_CONF unitless', 'Average Rotary Speed rpm', 'STUCK_RT unitless', 'Corrected Surface Weight on Bit kkgf', 'Corrected Total Hookload kkgf', 'MWD Turbine RPM rpm', 'MWD Raw Gamma Ray 1/s', 'MWD Continuous Inclination dega', 'Pump 2 Stroke Rate 1/min', 'Rate of Penetration m/h', 'Bit Drill Time h', 'Corrected Hookload kkgf', 'MWD GR Bit Confidence Flag %', 'Pump Time h', 'PowerUP Shock Rate 1/s', 'Total SPM 1/min', 'Average Hookload kkgf', 'Total Hookload kkgf', 'Extrapolated Hole TVD m', 'MWD Gamma Ray (API BH corrected) gAPI', 'EDRT unitless', 'Pump 1 Stroke Rate 1/min', 'Total Bit Revolutions unitless', 'Mud Density In g/cm3.1', 'Weight on Bit kkgf', 'Hole Depth (TVD) m', 'MWD Shock Risk unitless', 'Bit run number unitless', 'Inverse ROP s/m', 'Pump 4 Stroke Rate 1/min', 'Rig Mode unitless', 'MWD Shock Peak m/s2', 'SPN Sp_RigMode 2hz unitless', 'Average Standpipe Pressure kPa', 'Rate of Penetration (5ft avg) m/h', 'AJAM_MWD unitless', '1/2ft ROP m/h', 'Hole depth (MD) m', 'Mud Flow In L/min', 'BHFG unitless', 'MWD DNI Temperature degC', 'Average Surface Torque kN.m', 'Total Downhole RPM rpm', 'SHK3TM_RT min', 'Pump 3 Stroke Rate 1/min', 'Inverse ROP (5ft avg) s/m', 'S1AC kPa', 'S2AC kPa', 'IMWT g/cm3', 'OSTM s']
+
+df = df[cols]
+smartfills = np.linspace(0,1.0000001,11)
+counts = []
+percentages = []
+
+for smartfill in smartfills:
+    fill_method = []
+    
+    for attribute in list(df):
+                
+        try:
+            dropna_diff = np.diff(df[attribute].dropna())
+        
+            try:
+                zeros_p = np.count_nonzero(dropna_diff == 0) / len(dropna_diff)
+                
+                if zeros_p >= smartfill: # Threshold to check?
+                    fill_method.append(1)
+                else:
+                    fill_method.append(0)
+            except:
+                pass
+                #print(f'{attribute} failed 1')
+        except:
+            pass
+            #print(f'{attribute} failed 2')
+            
+    #print(smartfill)        
+    #print(f'Average {np.mean(fill_method)}')
+    #print(f'Count {np.sum(fill_method)}')
+    counts.append(np.sum(fill_method))
+    percentages.append(np.mean(fill_method))
+
+percentages = np.asarray(percentages)
+percentages = percentages*100
+
+#plt.figure(figsize=(4,3))
+import seaborn as sns
+df = pd.read_csv('filling_study_rop.csv')
+
+
+sns.boxplot(x=df['smartfill'], y=df['MAE'],color='gray' , ax=axs[0])
+labels = np.round(np.linspace(0,100,11),0).astype(int)
+axs[0].set_xlabel('')
+#labels[0] = 'FF only'
+#labels[-1]= 'LI only'
+axs[0].set_xticks(np.linspace(0,10,11))
+axs[0].set_xticklabels([]*11)
+axs[1].set_xticks(np.linspace(0,10,11))
+axs[1].set_xticklabels(labels, rotation=90)
+axs[1].set_xlabel('''Imputation algorithm selection threshold [%]''')
+#plt.xticks(np.linspace(0,11,11), np.linspace(0,1,11))
+
+axs[0].set_ylabel('Mean Absolute Error [deg]')
+plt.tight_layout()
+
+axs[0].grid()
+
+axs[0].set_xlim(-0.5,10.5)
+axs[1].set_xlim(-0.5,10.5)
+axs[1].bar(x = np.linspace(0,10,11),height=[53]*11, linewidth=1,
+           color='blue', linestyle = '-', label='linear interpolation',
+          edgecolor='black')
+
+axs[1].bar(x = np.linspace(0,10,11),height=counts, color='red',
+           linestyle = '-', label='forward filling',
+         linewidth=1, edgecolor='black')
+axs[1].set_ylabel('Quantity of attributes \n forward-filled')
+axs[1].tick_params(axis='y')
+axs[1].grid()
+axs[1].set_yticks([0,10,20,30,40,50])
+plt.legend(bbox_to_anchor=(1.05, 0.7), loc='upper left')
+plt.subplots_adjust(wspace=0, hspace=0.05)
+plt.savefig('smartfill_study_rop3.pdf')
+plt.show()
+A = df[np.round(df['smartfill'],1) == 1]['MAE'].to_list()
+B = df[np.round(df['smartfill'],1) == 0.2]['MAE'].to_list()
+from scipy import stats
+t_check=stats.ttest_ind(A,B)
+print(t_check[1])

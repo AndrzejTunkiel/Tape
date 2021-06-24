@@ -554,7 +554,50 @@ plt.xlabel('x\n[index]')
 plt.ylabel('y=sin(x)')
 plt.tight_layout()
 plt.savefig('resampling_theory.pdf')
+#%%
+np.random.seed(1643)
+start = 0
+stop = 10
+samples = 50
+x = np.random.uniform(start, stop, samples)
+x = np.sort(x)
+y = np.sin(x)
 
+
+xtrue = np.linspace(start, stop , 1000)
+ytrue = np.sin(xtrue)
+reg = KNeighborsRegressor(n_neighbors = 3,
+                          weights='distance')
+reg.fit(x.reshape(-1,1),y)
+
+x_uniform = np.linspace(start, stop , samples)
+
+y_reg = reg.predict(x_uniform.reshape(-1,1))
+
+fig,ax = plt.subplots(1, figsize=(7,4))
+
+#plt.scatter(x_uniform, y, s=10, c='blue', marker='v', label='raw, unindexed')
+plt.plot(x_uniform, y, linewidth=0.5, c='red', alpha=1,  marker='d',
+         label='raw\nequidistant', markersize=5)
+
+plt.scatter(x_uniform, y_reg, s=60, marker='x', c='blue', label='resampled,\nequidistant')
+
+plt.scatter(x, y, s=15, marker='8', c='black', label='raw\nx-indexed')
+plt.plot(xtrue,ytrue, c='black', linestyle='dashdot', linewidth=0.5, alpha=1, label='true signal')
+
+handles,labels = ax.get_legend_handles_labels()
+
+handles = [handles[1], handles[3], handles[0], handles[2]]
+labels = [labels[1], labels[3], labels[0], labels[2]]
+#plt.legend(handles, labels, loc='lower left')
+plt.legend(bbox_to_anchor=(1.05, 1),
+           loc='upper left')
+plt.grid()
+plt.xlabel('x\n[index]')
+plt.ylabel('y=sin(x)')
+plt.tight_layout()
+
+plt.savefig('resampling_theory_phd.pdf')
 #%%
 
 local_results = []

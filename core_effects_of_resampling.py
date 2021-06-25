@@ -632,7 +632,7 @@ plt.yscale('log')
 ymax = 3.1
 plt.yticks(np.arange(1,ymax,0.2), np.arange(100,ymax*100,20).astype(int))
 plt.grid()
-plt.xlabel('neighbor count / radius multiplied')
+plt.xlabel('neighbor count / radius multiplier')
 plt.ylabel('average RMS error\ncompared to best selection [%]')
 plt.ylim(1,3)
 plt.xticks(np.arange(-1,31,5), np.arange(0,32,5))

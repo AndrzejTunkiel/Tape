@@ -506,7 +506,7 @@ axs[1].bar(x = np.linspace(0,10,11),height=[53]*11, linewidth=1,
 axs[1].bar(x = np.linspace(0,10,11),height=counts, color='red',
            linestyle = '-', label='forward filling',
          linewidth=1, edgecolor='black')
-axs[1].set_ylabel('Quantity of attributes \n forward-filled')
+axs[1].set_ylabel('Quantity of attributes')
 axs[1].tick_params(axis='y')
 axs[1].grid()
 axs[1].set_yticks([0,10,20,30,40,50])
@@ -598,7 +598,7 @@ axs[1].bar(x = np.linspace(0,10,11),height=[53]*11, linewidth=1,
 axs[1].bar(x = np.linspace(0,10,11),height=counts, color='red',
            linestyle = '-', label='forward filling',
          linewidth=1, edgecolor='black')
-axs[1].set_ylabel('Quantity of attributes \n forward-filled')
+axs[1].set_ylabel('Quantity of attributes')
 axs[1].tick_params(axis='y')
 axs[1].grid()
 axs[1].set_yticks([0,10,20,30,40,50])

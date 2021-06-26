@@ -588,7 +588,7 @@ for target in list(data):
         global_results.append(local_result)
         
         plt.xlabel('neigbor count / radius multiplier')
-        plt.ylabel('error [RMS]')
+        plt.ylabel('error [RMRS]')
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.title(target)
         plt.grid()
@@ -633,7 +633,7 @@ ymax = 3.1
 plt.yticks(np.arange(1,ymax,0.2), np.arange(100,ymax*100,20).astype(int))
 plt.grid()
 plt.xlabel('neighbor count / radius multiplier')
-plt.ylabel('average RMS error\ncompared to best selection [%]')
+plt.ylabel('RMRS error\ncompared to best selection [%]')
 plt.ylim(1,3)
 plt.xticks(np.arange(-1,31,5), np.arange(0,32,5))
 plt.savefig('algocompare.pdf')
